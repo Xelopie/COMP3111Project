@@ -79,9 +79,6 @@ public class Controller {
     @FXML
     void findInstructorSfq() {
     	buttonInstructorSfq.setDisable(true);
-    	// Add line begin
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + textfieldSfqUrl.getText());
-    	// Add line end
     }
 
     @FXML
