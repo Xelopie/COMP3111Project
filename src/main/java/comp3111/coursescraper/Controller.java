@@ -10,6 +10,7 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -40,10 +41,43 @@ public class Controller {
     private Tab tabStatistic;
 
     @FXML
-    private ComboBox<?> comboboxTimeSlot;
+    private Tab tabFilter;
 
     @FXML
-    private Tab tabFilter;
+    private CheckBox cboxAM;
+
+    @FXML
+    private CheckBox cboxPM;
+
+    @FXML
+    private CheckBox cboxMon;
+
+    @FXML
+    private CheckBox cboxTue;
+
+    @FXML
+    private CheckBox cboxWed;
+
+    @FXML
+    private CheckBox cboxThur;
+
+    @FXML
+    private CheckBox cboxFri;
+
+    @FXML
+    private CheckBox cboxSat;
+
+    @FXML
+    private Button buttonSelectAll;
+
+    @FXML
+    private CheckBox cboxCC;
+
+    @FXML
+    private CheckBox cboxNoEx;
+
+    @FXML
+    private CheckBox cboxLabOrTut;
 
     @FXML
     private Tab tabList;
@@ -56,6 +90,9 @@ public class Controller {
 
     @FXML
     private ProgressBar progressbar;
+
+    @FXML
+    private Tab tabSfq;
 
     @FXML
     private TextField textfieldSfqUrl;
@@ -88,7 +125,7 @@ public class Controller {
     void findSfqEnrollCourse() {
 
     }
-
+    
     @FXML
     void search() {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
@@ -116,9 +153,48 @@ public class Controller {
     	randomLabel.setMaxHeight(60);
     
     	ap.getChildren().addAll(randomLabel);
-    	
-    	
-    	
     }
+    
+    @FXML
+    void selectAll() {
+    	if (buttonSelectAll.getText().equals("Select All")) 
+    	{
+	    	cboxAM.setSelected(true);
+	    	cboxPM.setSelected(true);
+	    	
+	    	cboxMon.setSelected(true);
+	    	cboxTue.setSelected(true);
+	    	cboxWed.setSelected(true);
+	    	cboxThur.setSelected(true);
+	    	cboxFri.setSelected(true);
+	    	cboxSat.setSelected(true);
+	    	
+	    	cboxCC.setSelected(true);
+	    	cboxNoEx.setSelected(true);
+	    	
+	    	cboxLabOrTut.setSelected(true);
+	    	
+	    	buttonSelectAll.setText("De-select All");
+    	}
+    	else {
+	    	cboxAM.setSelected(false);
+	    	cboxPM.setSelected(false);
+	    	
+	    	cboxMon.setSelected(false);
+	    	cboxTue.setSelected(false);
+	    	cboxWed.setSelected(false);
+	    	cboxThur.setSelected(false);
+	    	cboxFri.setSelected(false);
+	    	cboxSat.setSelected(false);
+	    	
+	    	cboxCC.setSelected(false);
+	    	cboxNoEx.setSelected(false);
+	    	
+	    	cboxLabOrTut.setSelected(false);
+	    	
+	    	buttonSelectAll.setText("Select All");
+    	}
+    }
+    
 
 }
