@@ -1,13 +1,12 @@
 package comp3111.coursescraper;
 
-
-
 public class Course {
 	private static final int DEFAULT_MAX_SLOT = 20;
 	
 	private String title ; 
 	private String description ;
 	private String exclusion;
+	private Section[] sections;
 	private Slot [] slots;
 	private int numSlots;
 	
