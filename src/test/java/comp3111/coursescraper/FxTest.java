@@ -14,6 +14,7 @@ import org.testfx.framework.junit.ApplicationTest;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
@@ -43,5 +44,15 @@ public class FxTest extends ApplicationTest {
 		Button b = (Button)s.lookup("#buttonInstructorSfq");
 		sleep(1000);
 		assertTrue(b.isDisabled());
+		
 	}
+	
+//	@Test
+//	public void testButtonSelectAll() {
+//		clickOn("#tabFilter");
+//		clickOn("#buttonSelectAll");
+//		CheckBox cbox = (CheckBox)s.lookup("#cboxAM");
+//		sleep(1000);
+//		assertTrue(cbox.isSelected() == true);
+//	}
 }
