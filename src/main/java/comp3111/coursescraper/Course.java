@@ -7,12 +7,14 @@ public class Course {
 	private String description ;
 	private String exclusion;
 	private Section[] sections;
+	private int numSections;
 	private Slot [] slots;
 	private int numSlots;
 	
 	public Course() {
 		slots = new Slot[DEFAULT_MAX_SLOT];
 		for (int i = 0; i < DEFAULT_MAX_SLOT; i++) slots[i] = null;
+		numSections = 0;
 		numSlots = 0;
 	}
 	
@@ -27,6 +29,18 @@ public class Course {
 		return null;
 	}
 
+	public void addSection(Section s)
+	{
+		sections[numSections++] = s.clone();
+	}
+	
+	public Section getSection(int i)
+	{
+		if (i >= 0 && i < numSections)
+			return sections[i];
+		return null;
+	}
+	
 	/**
 	 * @return the title
 	 */
@@ -83,5 +97,7 @@ public class Course {
 		this.numSlots = numSlots;
 	}
 	
+	public int getNumSections() { return numSections; }
+	public void setNumSections(int numSections) { this.numSections = numSections; }
 
 }

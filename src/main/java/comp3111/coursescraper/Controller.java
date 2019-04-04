@@ -133,7 +133,7 @@ public class Controller {
     		String newline = c.getTitle() + "\n";
     		for (int i = 0; i < c.getNumSlots(); i++) {
     			Slot t = c.getSlot(i);
-    			newline += "Slot " + i + ":" + t + "\n";
+    			newline += "Slot " + i + ": " + /*c.getSection(0).toString() + " " +*/ t + "\n";
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
