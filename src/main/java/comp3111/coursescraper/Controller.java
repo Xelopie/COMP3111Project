@@ -131,9 +131,15 @@ public class Controller {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
-    		for (int i = 0; i < c.getNumSlots(); i++) {
-    			Slot t = c.getSlot(i);
-    			newline += "Slot " + i + ": " + t + "\n";
+    		int totalSlot = 0;
+    		for (int i = 0; i < c.getNumSections(); i++)
+    		{
+	    		Section current = c.getSection(i);
+    			for (int j = 0; j < current.getNumSlots(); j++)
+	    		{
+	    			Slot t = current.getSlot(j);
+	    			newline += "Slot " + totalSlot++ + ": " + current + " " + t + "\n";
+	    		}
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
