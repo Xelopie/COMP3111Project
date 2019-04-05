@@ -202,5 +202,13 @@ public class Controller {
     	}
     }
     
+    @FXML
+    void updateConsole() {
+    	if (cboxAM.isSelected()) 
+    		textAreaConsole.setText("AM: ON");
+    	else
+    		textAreaConsole.setText("AM: OFF");
+    }
+    
 
 }
