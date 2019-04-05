@@ -86,7 +86,18 @@ public class Scraper {
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
 	}
-
+	
+	private void addSection(HtmlElement e, Course c)
+	{
+		e = (HtmlElement)e.getFirstByXPath(".//td");
+		String sect[] = e.asText().split(" ");
+		Section s = new Section();
+		s.setCode(sect[0]);
+		s.setID(sect[1].substring(1, sect[1].length()-1));
+		s.setEnrollStatus(false);
+		c.addSection(s);
+	}
+	
 	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
@@ -106,17 +117,6 @@ public class Scraper {
 
 	}
 
-	private void addSection(HtmlElement e, Course c)
-	{
-		e = (HtmlElement)e.getFirstByXPath(".//td");
-		String sect[] = e.asText().split(" ");
-		Section s = new Section();
-		s.setCode(sect[0]);
-		s.setID(sect[1].substring(1, sect[1].length()-1));
-		s.setEnrollStatus(false);
-		c.addSection(s);
-	}
-	
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {
@@ -145,7 +145,13 @@ public class Scraper {
 					}
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
-				
+
+				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
+				for (HtmlElement e: (List<HtmlElement>)sectionsInfo)
+				{
+					addSection(e, c);
+				}
+
 				List<?> sections = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for ( HtmlElement e: (List<HtmlElement>)sections) {
 					addSlot(e, c, false);
@@ -153,13 +159,7 @@ public class Scraper {
 					if (e != null && !e.getAttribute("class").contains("newsect"))
 						addSlot(e, c, true);
 				}
-				
-				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				for (HtmlElement e: (List<HtmlElement>)sectionsInfo)
-				{
-					addSection(e, c);
-				}
-				
+								
 				result.add(c);
 			}
 			client.close();

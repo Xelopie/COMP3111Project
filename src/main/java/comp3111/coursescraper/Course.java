@@ -38,7 +38,7 @@ public class Course {
 
 	public void addSection(Section s)
 	{
-		if (numSlots >= DEFAULT_MAX_SECTION)
+		if (numSections >= DEFAULT_MAX_SECTION)
 			return;
 		sections[numSections++] = s.clone();
 	}

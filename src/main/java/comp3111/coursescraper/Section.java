@@ -4,8 +4,13 @@ public class Section {
 	
 	private String id;
 	private String code;
-	private boolean enrollStatus = false;
+	private boolean enrollStatus;
 
+	public Section()
+	{
+		
+	}
+	
 	@Override
 	public Section clone()
 	{
