@@ -1,7 +1,7 @@
 package comp3111.coursescraper;
 
 public class Section {
-	private static final int DEFAULT_MAX_SLOT = 20;
+	private static final int DEFAULT_MAX_SLOT = 3;
 	
 	private String id;
 	private String code;
@@ -46,8 +46,8 @@ public class Section {
 			return slots[i];
 		return null;
 	}
-
-	public String toString() { return " " + code + " (" + id +  ")"; }
+	
+	public String toString() { return code + " (" + id +  ")"; }
 	/**
 	 * @return the numSlots
 	 */

@@ -129,16 +129,32 @@ public class Controller {
     @FXML
     void search() {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
+    	//The request URL is assembled by the 3 textfield inputs. If v == null, theoretically UnknownHostException is the only possible outcome
+    	if (v == null)
+    	{
+    		textAreaConsole.setText("404 Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
+    		return;
+    	}
+    	
+    	int sectionCount = 0;
+    	for (Course c : v)
+    	{
+    		sectionCount += c.getNumSections();
+    	}
+    	textAreaConsole.setText("Total Number of Course in this search: " + v.size() + "\nTotal Number of difference sections in this search: " + sectionCount + "\n");
+    	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
-    		int totalSlot = 0;
+    		int slotCount = 0;
     		for (int i = 0; i < c.getNumSections(); i++)
     		{
-	    		Section current = c.getSection(i);
-    			for (int j = 0; j < current.getNumSlots(); j++)
+	    		Section sect = c.getSection(i);
+    			for (int j = 0; j < sect.getNumSlots(); j++)
 	    		{
-	    			Slot t = current.getSlot(j);
-	    			newline += "Slot " + totalSlot++ + ": " + current + " " + t + "\n";
+	    			Slot slot = sect.getSlot(j);
+	    			int slotDigit = slotCount % 10;
+	    			newline += slotCount++ + (slotDigit == 1? "st": (slotDigit == 2? "nd": (slotDigit == 3? "rd": "th"))) + " slot total. ";
+	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
 	    		}
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);

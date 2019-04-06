@@ -1,6 +1,7 @@
 package comp3111.coursescraper;
 
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -123,7 +124,6 @@ public class Scraper {
 			
 			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
 
-			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
 			
 			Vector<Course> result = new Vector<Course>();
@@ -148,7 +148,6 @@ public class Scraper {
 
 				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				List<?> slotsInfo = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				int slotCount = 0;
 				for (int j = 0; j < sectionsInfo.size(); j++)
 				{
 					HtmlElement sectElem = (HtmlElement)sectionsInfo.get(j);
@@ -160,13 +159,14 @@ public class Scraper {
 					if (slotElem != null && !slotElem.getAttribute("class").contains("newsect"))
 						addSlot(slotElem, c.getSection(c.getNumSections()-1), true);
 				}
-				
+
 				result.add(c);
 			}
 			client.close();
 			return result;
 		} catch (Exception e) {
-			System.out.println(e);
+			//This should be the only error throwing operation that would appear on the system console
+			//System.out.println(e);
 		}
 		return null;
 	}
