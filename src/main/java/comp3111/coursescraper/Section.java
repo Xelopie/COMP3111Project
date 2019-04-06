@@ -1,5 +1,7 @@
 package comp3111.coursescraper;
 
+import java.time.LocalTime;
+
 public class Section {
 	private static final int DEFAULT_MAX_SLOT = 20;
 	
@@ -68,4 +70,37 @@ public class Section {
 	public void setEnrollStatus(boolean bool) {	enrollStatus = bool; }
 	public boolean getEnrollStatus() { return enrollStatus; }
 	
+	/* Helper functions for filter (Task 2) */
+	
+	public boolean containAMSlot() {
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getStart().isBefore(LocalTime.NOON)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containPMSlot() {
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containAMPMSlot() {
+		
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
+				return true;
+			}
+		}
+		
+		if (containAMSlot() && containPMSlot()) {
+			return true;
+		}
+		else return false;
+	}
 }

@@ -2,6 +2,8 @@ package comp3111.coursescraper;
 
 
 import java.awt.event.ActionEvent;
+import java.time.LocalTime;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -237,6 +239,7 @@ public class Controller {
     			!cboxNoEx.isSelected() &&
     			!cboxLabOrTut.isSelected()) 
     	{
+    		String output = "Unfiltered Output: (No conditions have been chosen)\n";
         	for (Course c : courseList) {
         		String newline = c.getTitle() + "\n";
         		for (int i = 0; i < c.getNumSections(); i++)
@@ -248,28 +251,50 @@ public class Controller {
     	    			newline += current + " Slot " + j + ": " + t + "\n";
     	    		}
         		}
-        		textAreaConsole.setText(textAreaConsole.getText() + newline + "\n");
+        		output += newline + "\n";
         	}
+    		textAreaConsole.setText(output + "\n");
     	}
     	// Else some conditions are true -> filter is on
     	else {
+    		String output = "Filtered Output: (Filter applied)\n";
         	for (Course c : courseList) {
         		String newline = c.getTitle() + "\n";
+        		boolean isTimeValid = false;
         		for (int i = 0; i < c.getNumSections(); i++)
         		{
-    	    		Section current = c.getSection(i);
-        			for (int j = 0; j < current.getNumSlots(); j++)
+    	    		Section section = c.getSection(i);
+    	    		
+    	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
+    	    			if (section.containAMPMSlot()) {
+    	    				isTimeValid = true;
+    	    			}
+    	    		}
+    	    		else if (cboxAM.isSelected()) {
+	    				if (section.containAMSlot()) {
+	    					isTimeValid = true;
+	    				}
+	    			}
+    	    		else if (cboxPM.isSelected()) {
+    	    			if (section.containPMSlot()) {
+    	    				isTimeValid = true;
+    	    			}
+    	    		}
+        			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
-    	    			Slot t = current.getSlot(j);
-    	    			newline += current + " Slot " + j + ": " + t + "\n";
+    	    			Slot slot = section.getSlot(j);
+
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
-        		textAreaConsole.setText(textAreaConsole.getText() + newline + "\n");
+        		if (isTimeValid) 
+        			output += newline + "\n";
         	}
+        	textAreaConsole.setText(output + "\n");
     	}
     	
 
     }
-    
+        
 
 }
