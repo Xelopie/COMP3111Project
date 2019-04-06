@@ -145,16 +145,14 @@ public class Controller {
     	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
-    		int slotCount = 0;
     		for (int i = 0; i < c.getNumSections(); i++)
     		{
 	    		Section sect = c.getSection(i);
     			for (int j = 0; j < sect.getNumSlots(); j++)
 	    		{
 	    			Slot slot = sect.getSlot(j);
-	    			//int slotDigit = slotCount % 10;
-	    			//newline += slotCount++ + (slotDigit == 1? "st": (slotDigit == 2? "nd": (slotDigit == 3? "rd": "th"))) + " slot total. ";
 	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
+	    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
 	    		}
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);

@@ -61,11 +61,11 @@ public class Section {
 		return null;
 	}
 	
-	public void addInstructor(Instructor i)
+	public void addInstructor(Instructor inst)
 	{
 		if (numInstructors >= DEFAULT_MAX_INSTRUCTOR)
 			return;
-		instructors[numInstructors++] = i;
+		instructors[numInstructors++] = inst.clone();
 	}
 	
 	public Instructor getInstructor(int i)
@@ -76,6 +76,16 @@ public class Section {
 	}
 	
 	public String toString() { return code + " (" + id +  ")"; }
+	
+	public String getInstructorString()
+	{
+		String instString = "";
+		for (int i = 0; i < numInstructors; i++)
+		{
+			instString += instructors[i] + "  ";
+		}
+		return instString;
+	}
 	
 	/**
 	 * @return the numSlots

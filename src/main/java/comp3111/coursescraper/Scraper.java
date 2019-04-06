@@ -101,7 +101,16 @@ public class Scraper {
 	
 	private void addInstructor(HtmlElement e, Section sect)
 	{
-		
+		List<?> instList = (List<?>)e.getByXPath(".//a");
+		if (instList == null)
+			return;
+		for (HtmlElement instElem: (List<HtmlElement>)instList)
+		{
+			Instructor inst = new Instructor();
+			inst.setName(instElem.asText());
+			sect.addInstructor(inst);
+			
+		}
 	}
 	
 	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
@@ -153,7 +162,7 @@ public class Scraper {
 
 				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				List<?> slotsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				List<?> instructorsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]/td");
+				List<?> instructorsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for (int j = 0; j < sectionsInfo.size(); j++)
 				{
 					HtmlElement sectElem = (HtmlElement)sectionsInfo.get(j);

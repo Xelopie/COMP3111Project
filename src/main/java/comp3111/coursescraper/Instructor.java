@@ -12,6 +12,8 @@ public class Instructor
 		return i;
 	}
 	
+	public String toString() { return name; }
+	
 	public String getName() { return name; }
 	public void setName(String s) { name = s; }
 	
