@@ -108,6 +108,8 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    private List<Course> courseList;
+    
     @FXML
     void allSubjectSearch() {
     	
@@ -144,6 +146,9 @@ public class Controller {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     	
+    	// Save the scraped data for later use
+    	courseList = v;
+    	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
     	Label randomLabel = new Label("COMP1022\nL1");
@@ -161,7 +166,9 @@ public class Controller {
     	ap.getChildren().addAll(randomLabel);
     }
     
+    // Button "Select All" function
     @FXML
+    
     void selectAll() {
     	if (buttonSelectAll.getText().equals("Select All")) 
     	{
@@ -201,13 +208,67 @@ public class Controller {
 	    	buttonSelectAll.setText("Select All");
     	}
     }
-    
+
+    // Event used to update the info displayed in console in filter tab 
     @FXML
     void updateConsole() {
-    	if (cboxAM.isSelected()) 
-    		textAreaConsole.setText("AM: ON");
-    	else
-    		textAreaConsole.setText("AM: OFF");
+//    	// Test function
+//    	if (cboxAM.isSelected()) 
+//    		textAreaConsole.setText("AM: ON");
+//    	else
+//    		textAreaConsole.setText("AM: OFF");
+    	
+    	// Clear the console first
+    	textAreaConsole.setText("");
+    	
+    	// Return if courseList is empty
+    	if (courseList == null) return;
+    	
+    	// If all conditions are false -> filter is disabled    	
+    	if (!cboxAM.isSelected() && 
+    			!cboxPM.isSelected() && 
+    			!cboxMon.isSelected() &&
+    			!cboxTue.isSelected() &&
+    			!cboxWed.isSelected() &&
+    			!cboxThur.isSelected() &&
+    			!cboxFri.isSelected() &&
+    			!cboxSat.isSelected() &&
+    			!cboxCC.isSelected() &&
+    			!cboxNoEx.isSelected() &&
+    			!cboxLabOrTut.isSelected()) 
+    	{
+        	for (Course c : courseList) {
+        		String newline = c.getTitle() + "\n";
+        		for (int i = 0; i < c.getNumSections(); i++)
+        		{
+    	    		Section current = c.getSection(i);
+        			for (int j = 0; j < current.getNumSlots(); j++)
+    	    		{
+    	    			Slot t = current.getSlot(j);
+    	    			newline += current + " Slot " + j + ": " + t + "\n";
+    	    		}
+        		}
+        		textAreaConsole.setText(textAreaConsole.getText() + newline + "\n");
+        	}
+    	}
+    	// Else some conditions are true -> filter is on
+    	else {
+        	for (Course c : courseList) {
+        		String newline = c.getTitle() + "\n";
+        		for (int i = 0; i < c.getNumSections(); i++)
+        		{
+    	    		Section current = c.getSection(i);
+        			for (int j = 0; j < current.getNumSlots(); j++)
+    	    		{
+    	    			Slot t = current.getSlot(j);
+    	    			newline += current + " Slot " + j + ": " + t + "\n";
+    	    		}
+        		}
+        		textAreaConsole.setText(textAreaConsole.getText() + newline + "\n");
+        	}
+    	}
+    	
+
     }
     
 
