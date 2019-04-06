@@ -99,6 +99,11 @@ public class Scraper {
 		c.addSection(s);
 	}
 	
+	private void addInstructor(HtmlElement e, Section sect)
+	{
+		
+	}
+	
 	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
@@ -147,17 +152,21 @@ public class Scraper {
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
 
 				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				List<?> slotsInfo = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
+				List<?> slotsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
+				List<?> instructorsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]/td");
 				for (int j = 0; j < sectionsInfo.size(); j++)
 				{
 					HtmlElement sectElem = (HtmlElement)sectionsInfo.get(j);
 					addSection(sectElem, c);
 					
+					HtmlElement instElem = (HtmlElement)instructorsInfo.get(j);
+					addInstructor(instElem, c.getSection(j));
+					
 					HtmlElement slotElem = (HtmlElement)slotsInfo.get(j);
-					addSlot(slotElem, c.getSection(c.getNumSections()-1), false);
+					addSlot(slotElem, c.getSection(j), false);
 					slotElem = (HtmlElement)slotElem.getNextSibling();
 					if (slotElem != null && !slotElem.getAttribute("class").contains("newsect"))
-						addSlot(slotElem, c.getSection(c.getNumSections()-1), true);
+						addSlot(slotElem, c.getSection(j), true);
 				}
 
 				result.add(c);
@@ -166,7 +175,7 @@ public class Scraper {
 			return result;
 		} catch (Exception e) {
 			//This should be the only error throwing operation that would appear on the system console
-			//System.out.println(e);
+			System.out.println(e);
 		}
 		return null;
 	}

@@ -152,8 +152,8 @@ public class Controller {
     			for (int j = 0; j < sect.getNumSlots(); j++)
 	    		{
 	    			Slot slot = sect.getSlot(j);
-	    			int slotDigit = slotCount % 10;
-	    			newline += slotCount++ + (slotDigit == 1? "st": (slotDigit == 2? "nd": (slotDigit == 3? "rd": "th"))) + " slot total. ";
+	    			//int slotDigit = slotCount % 10;
+	    			//newline += slotCount++ + (slotDigit == 1? "st": (slotDigit == 2? "nd": (slotDigit == 3? "rd": "th"))) + " slot total. ";
 	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
 	    		}
     		}
