@@ -112,9 +112,8 @@ public class Section {
 	
 	public boolean isValidSection()
 	{
-		if (code.substring(1, 2).equals("A"))
+		if (code.substring(0, 1).equals("L") || code.substring(0, 1).equals("T") || code.substring(1, 2).equals("LA"))
 			return true;
-		
 		return false;
 	}
 	

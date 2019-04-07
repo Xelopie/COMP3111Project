@@ -79,7 +79,23 @@ public class Course {
 	
 	public boolean isValidCourse()
 	{
-		return (numSections == 0? false: true);
+		for (int i = 0; i < numSections; i++)
+		{
+			if (!sections[i].isValidSection())
+				return false;
+		}
+		return true;
 	}
 
+	public int getNumValidSections()
+	{
+		int validCount = numSections;
+		for (int i = 0; i < numSections; i++)
+		{
+			if (!sections[i].isValidSection())
+				validCount--;
+		}
+		return validCount;
+	}
+	
 }

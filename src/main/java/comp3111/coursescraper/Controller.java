@@ -132,7 +132,7 @@ public class Controller {
     	//The request URL is assembled by the 3 textfield inputs. If v == null, theoretically UnknownHostException is the only possible outcome
     	if (v == null)
     	{
-    		textAreaConsole.setText("404 Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
+    		textAreaConsole.setText("Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
     		return;
     	}
     	
@@ -141,9 +141,9 @@ public class Controller {
     	{
     		if (c.isValidCourse())
     			courseCount++;
-    		sectionCount += c.getNumSections();
+    		sectionCount += c.getNumValidSections();
     	}
-    	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount + "\n" + v.get(0).getSection(0) +  "\n");
+    	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
@@ -154,7 +154,8 @@ public class Controller {
 	    		{
 	    			Slot slot = sect.getSlot(j);
 	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
-	    			newline += "Taught by: " + sect.getInstructorString() + "\n";
+	    			//Echo for checking instructors[]
+	    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
 	    		}
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
