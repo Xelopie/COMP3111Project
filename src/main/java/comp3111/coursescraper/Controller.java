@@ -259,7 +259,7 @@ public class Controller {
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
         	for (Course course : courseList) {
-        		String newline = course.getTitle() + "\n" + course.getAttribute() + "\n" + course.getExclusion() + "\n";
+        		String newline = course.getTitle() + "\n Attribute: (Debug) " + course.getAttribute() + "\n Exclusion: (Debug) " + course.getExclusion() + "\n";
         		
         		/* Bools for filter */
         		boolean isTimeValid = false;
