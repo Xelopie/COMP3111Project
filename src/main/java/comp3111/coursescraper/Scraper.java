@@ -113,6 +113,7 @@ public class Scraper {
 		}
 	}
 	
+	//May need to edit to support like MGCS courses that puts dates before time 
 	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
 		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
 		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();

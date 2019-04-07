@@ -1,5 +1,9 @@
 package comp3111.coursescraper;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 public class Section {
 	private static final int DEFAULT_MAX_SLOT = 3;
 	private static final int DEFAULT_MAX_INSTRUCTOR = 4;
@@ -114,6 +118,18 @@ public class Section {
 	{
 		if (code.substring(0, 1).equals("L") || code.substring(0, 1).equals("T") || code.substring(1, 2).equals("LA"))
 			return true;
+		return false;
+	}
+	
+	public boolean isBusyAt(int day, String time)
+	{
+		LocalTime parsedTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mma", Locale.US));
+		for (int i = 0; i < numSlots; i++)
+		{
+			if (slots[i].getDay() == day)
+				if (!(slots[i].getStart().isAfter(parsedTime) || !slots[i].getEnd().isBefore(parsedTime)))
+					return true;
+		}
 		return false;
 	}
 	

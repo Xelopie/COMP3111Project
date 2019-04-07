@@ -19,7 +19,10 @@ import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
 
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 public class Controller {
 
     @FXML
@@ -145,6 +148,48 @@ public class Controller {
     	}
     	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
+    	List<String> instList = new ArrayList<String>();
+    	for (Course c: v)
+    	{
+    		for (int i = 0; i < c.getNumSections(); i++)
+    		{
+    			Section sect = c.getSection(i);
+    			for (int j = 0; j < sect.getNumInstructors(); j++)
+    			{
+    				if (!instList.contains(sect.getInstructor(j).toString()))
+    					instList.add(sect.getInstructor(j).toString());
+    			}
+    		}
+    	}
+    	for (Course c: v)
+    	{
+    		for (int i = 0; i < c.getNumSections(); i++)
+    		{
+    			Section sect = c.getSection(i);
+    			int queryDay = 2;
+    			String queryTime = "03:10PM";
+    			if (sect.isBusyAt(queryDay, queryTime))
+    			{
+					for (int j = 0; j < sect.getNumInstructors(); j++)
+						instList.remove(sect.getInstructor(j).toString());
+					System.out.println("Removing stuff");
+				}
+    		}
+    	}
+    	Collections.sort(instList);
+    	String queryStr = "Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: \n"; 
+    	if (instList.size() == 0)
+    		queryStr += "None.\n";
+    	else
+    	{
+    		for (int i = 0; i < instList.size(); i++)
+    		{
+    			queryStr += instList.get(i);
+    			queryStr += (i == instList.size()-1? "\n": "; ");
+    		}
+    	}
+    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);
+    	    	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
     		for (int i = 0; i < c.getNumSections(); i++)
