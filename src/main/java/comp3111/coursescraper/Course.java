@@ -76,5 +76,10 @@ public class Course {
 
 	public int getNumSections() { return numSections; }
 	public void setNumSections(int numSections) { this.numSections = numSections; }
+	
+	public boolean isValidCourse()
+	{
+		return (numSections == 0? false: true);
+	}
 
 }

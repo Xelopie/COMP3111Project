@@ -110,4 +110,12 @@ public class Section {
 	public void setNumInstructors(int i) { numInstructors = i; }
 	public int getNumInstructors() { return numInstructors; }
 	
+	public boolean isValidSection()
+	{
+		if (code.substring(1, 2).equals("A"))
+			return true;
+		
+		return false;
+	}
+	
 }

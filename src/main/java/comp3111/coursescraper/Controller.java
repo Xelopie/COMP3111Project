@@ -136,12 +136,14 @@ public class Controller {
     		return;
     	}
     	
-    	int sectionCount = 0;
+    	int courseCount = 0, sectionCount = 0;
     	for (Course c : v)
     	{
+    		if (c.isValidCourse())
+    			courseCount++;
     		sectionCount += c.getNumSections();
     	}
-    	textAreaConsole.setText("Total Number of Course in this search: " + v.size() + "\nTotal Number of difference sections in this search: " + sectionCount + "\n");
+    	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount + "\n" + v.get(0).getSection(0) +  "\n");
     	
     	for (Course c : v) {
     		String newline = c.getTitle() + "\n";
@@ -152,7 +154,7 @@ public class Controller {
 	    		{
 	    			Slot slot = sect.getSlot(j);
 	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
-	    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
+	    			newline += "Taught by: " + sect.getInstructorString() + "\n";
 	    		}
     		}
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);

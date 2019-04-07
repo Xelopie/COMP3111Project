@@ -184,7 +184,7 @@ public class Scraper {
 			return result;
 		} catch (Exception e) {
 			//This should be the only error throwing operation that would appear on the system console
-			System.out.println(e);
+			//System.out.println(e);
 		}
 		return null;
 	}
