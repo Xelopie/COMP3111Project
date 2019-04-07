@@ -72,7 +72,7 @@ public class Section {
 	
 	/* Helper functions for filter (Task 2) */
 	
-	public boolean containAMSlot() {
+	public boolean containsAMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON)) {
 				return true;
@@ -81,7 +81,7 @@ public class Section {
 		return false;
 	}
 	
-	public boolean containPMSlot() {
+	public boolean containsPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON)) {
 				return true;
@@ -90,14 +90,14 @@ public class Section {
 		return false;
 	}
 	
-	public boolean containAMPMSlot() {
+	public boolean containsAMPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
 				return true;
 			}
 		}
 		
-		if (containAMSlot() && containPMSlot()) {
+		if (containsAMSlot() && containsPMSlot()) {
 			return true;
 		}
 		else return false;

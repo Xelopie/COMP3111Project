@@ -240,15 +240,15 @@ public class Controller {
     			!cboxLabOrTut.isSelected()) 
     	{
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
-        	for (Course c : courseList) {
-        		String newline = c.getTitle() + "\n";
-        		for (int i = 0; i < c.getNumSections(); i++)
+        	for (Course course : courseList) {
+        		String newline = course.getTitle() + "\n";
+        		for (int i = 0; i < course.getNumSections(); i++)
         		{
-    	    		Section current = c.getSection(i);
-        			for (int j = 0; j < current.getNumSlots(); j++)
+    	    		Section section = course.getSection(i);
+        			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
-    	    			Slot t = current.getSlot(j);
-    	    			newline += current + " Slot " + j + ": " + t + "\n";
+    	    			Slot slot = section.getSlot(j);
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
         		output += newline + "\n";
@@ -258,34 +258,66 @@ public class Controller {
     	// Else some conditions are true -> filter is on
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
-        	for (Course c : courseList) {
-        		String newline = c.getTitle() + "\n";
+        	for (Course course : courseList) {
+        		String newline = course.getTitle() + "\n" + course.getAttribute() + "\n" + course.getExclusion() + "\n";
         		
-        		boolean isTimeValid = (!cboxAM.isSelected() && !cboxPM.isSelected());
+        		/* Bools for filter */
+        		boolean isTimeValid = false;
         		boolean isDayValid = false;
+        		boolean isCCValid = false;
+        		boolean isNoExValid = false;
+        		boolean isLabOrTutValid = false;
         		
+        		/* Bool array used for Day Filter */
         		boolean isDaySelected[] = {cboxMon.isSelected(), cboxTue.isSelected(), cboxWed.isSelected(), cboxThur.isSelected(), cboxFri.isSelected(), cboxSat.isSelected()};
         		
-        		for (int i = 0; i < c.getNumSections(); i++)
+        		/* Filter conditions for courses */
+        		// CC 4Y
+        		if (cboxCC.isSelected()) {
+	        		if (course.isCC4Y()) {
+	        			isCCValid = true;
+	        		}
+        		}
+        		else isCCValid = true;
+        		
+        		// No Exclusion
+        		if (cboxNoEx.isSelected()) {
+        			if (course.isNoEx()) {
+        				isNoExValid = true;
+        			}
+        		}
+        		else isNoExValid = true;
+        		
+        		// Contains Labs or Tutorials
+        		if (cboxLabOrTut.isSelected()) {
+        			if (course.containsLabOrTut()) {
+        				isLabOrTutValid = true;
+        			}
+        		}
+        		else isLabOrTutValid = true;
+        		
+        		for (int i = 0; i < course.getNumSections(); i++)
         		{
-    	    		Section section = c.getSection(i);
-    	    		/* Filter conditions */
+    	    		Section section = course.getSection(i);
+    	    		
+    	    		/* Filter conditions for sections */
     	    		// AM/PM 
     	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
-    	    			if (section.containAMPMSlot()) {
+    	    			if (section.containsAMPMSlot()) {
     	    				isTimeValid = true;
     	    			}
     	    		}
     	    		else if (cboxAM.isSelected()) {
-	    				if (section.containAMSlot()) {
+	    				if (section.containsAMSlot()) {
 	    					isTimeValid = true;
 	    				}
 	    			}
     	    		else if (cboxPM.isSelected()) {
-    	    			if (section.containPMSlot()) {
+    	    			if (section.containsPMSlot()) {
     	    				isTimeValid = true;
     	    			}
     	    		}
+    	    		else isTimeValid = true;
     	    		
     	    		// Days
     	    		boolean[] bContainDaySlot = section.containDaySlot();
@@ -296,6 +328,8 @@ public class Controller {
     	    			if (day == 5) isDayValid = true;
     	    		}
     	    		
+    	    		// 
+    	    		
     	    		// Modify output function
         			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
@@ -304,7 +338,7 @@ public class Controller {
     	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
-        		if (isTimeValid && isDayValid) 
+        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid) 
         			output += newline + "\n";
         	}
         	textAreaConsole.setText(output + "\n");

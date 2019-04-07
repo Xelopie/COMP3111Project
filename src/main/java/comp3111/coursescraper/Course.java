@@ -6,6 +6,7 @@ public class Course {
 	private String title ; 
 	private String description ;
 	private String exclusion;
+	private String attribute;
 	private Section[] sections;
 	private int numSections;
 	
@@ -74,7 +75,45 @@ public class Course {
 		this.exclusion = exclusion;
 	}
 
+	/**
+	 * @return the attribute
+	 */
+	public String getAttribute() {
+		return attribute;
+	}
+	
+	/**
+	 * @param attribute the attribute to set
+	 */
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
+	}
+	
 	public int getNumSections() { return numSections; }
 	public void setNumSections(int numSections) { this.numSections = numSections; }
+	
+	/* Helper functions for filter (Task 2) */
+	
+	public boolean isCC4Y() {
+		if (attribute.contains("Common Core") && attribute.contains("4Y")) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isNoEx() {
+		if (exclusion == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean containsLabOrTut() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].getCode().contains("LA") || sections[i].getCode().contains("T"))
+				return true;
+		}
+		return false;
+	}
 
 }
