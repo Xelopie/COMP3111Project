@@ -91,7 +91,6 @@ public class Section {
 	}
 	
 	public boolean containAMPMSlot() {
-		
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
 				return true;
@@ -102,5 +101,17 @@ public class Section {
 			return true;
 		}
 		else return false;
+	}
+	
+	public boolean[] containDaySlot() {
+		boolean[] bContainDaySlot = new boolean[6];
+		for (int i = 0; i < numSlots; i++) {
+			for (int j = 0; j < 6; j++) {
+				if (slots[i].getDay() == j) {
+					bContainDaySlot[j] = true;
+				}
+			}
+		}
+		return bContainDaySlot;
 	}
 }

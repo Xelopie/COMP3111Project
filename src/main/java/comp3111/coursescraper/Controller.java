@@ -260,11 +260,17 @@ public class Controller {
     		String output = "Filtered Output: (Filter applied)\n";
         	for (Course c : courseList) {
         		String newline = c.getTitle() + "\n";
-        		boolean isTimeValid = false;
+        		
+        		boolean isTimeValid = (!cboxAM.isSelected() && !cboxPM.isSelected());
+        		boolean isDayValid = false;
+        		
+        		boolean isDaySelected[] = {cboxMon.isSelected(), cboxTue.isSelected(), cboxWed.isSelected(), cboxThur.isSelected(), cboxFri.isSelected(), cboxSat.isSelected()};
+        		
         		for (int i = 0; i < c.getNumSections(); i++)
         		{
     	    		Section section = c.getSection(i);
-    	    		
+    	    		/* Filter conditions */
+    	    		// AM/PM 
     	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
     	    			if (section.containAMPMSlot()) {
     	    				isTimeValid = true;
@@ -280,6 +286,17 @@ public class Controller {
     	    				isTimeValid = true;
     	    			}
     	    		}
+    	    		
+    	    		// Days
+    	    		boolean[] bContainDaySlot = section.containDaySlot();
+    	    		for (int day = 0; day < 6; day++) { 
+    	    			if (isDaySelected[day]) {
+    	    				if (!bContainDaySlot[day]) break;
+    	    			}
+    	    			if (day == 5) isDayValid = true;
+    	    		}
+    	    		
+    	    		// Modify output function
         			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
     	    			Slot slot = section.getSlot(j);
@@ -287,7 +304,7 @@ public class Controller {
     	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
-        		if (isTimeValid) 
+        		if (isTimeValid && isDayValid) 
         			output += newline + "\n";
         	}
         	textAreaConsole.setText(output + "\n");
