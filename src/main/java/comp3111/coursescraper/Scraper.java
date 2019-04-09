@@ -113,10 +113,18 @@ public class Scraper {
 		}
 	}
 	
-	//May need to edit to support like MGCS courses that puts dates before time 
 	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
-		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
-		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+		String times[], venue;
+		if ((int)e.getChildNodes().get(secondRow ? 0 : 3).asText().charAt(0) >= 48 && (int)e.getChildNodes().get(secondRow ? 0 : 3).asText().charAt(0) <= 57)
+		{
+			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split("\n");
+			times = times[1].split(" ");
+		}
+		else
+		{
+			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
+		}
+		venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -185,7 +193,7 @@ public class Scraper {
 			return result;
 		} catch (Exception e) {
 			//This should be the only error throwing operation that would appear on the system console
-			//System.out.println(e);
+			System.out.println(e);
 		}
 		return null;
 	}
