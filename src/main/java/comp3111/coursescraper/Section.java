@@ -116,6 +116,7 @@ public class Section {
 	
 	public boolean isValidSection()
 	{
+		//By definition the section is invalid if a section isn't LX, LAX or TX
 		if (code.substring(0, 1).equals("L") || code.substring(0, 1).equals("T") || code.substring(1, 2).equals("LA"))
 			return true;
 		return false;
@@ -123,11 +124,11 @@ public class Section {
 	
 	public boolean isBusyAt(int day, String time)
 	{
-		LocalTime parsedTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mma", Locale.US));
+		LocalTime parsedTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mma", Locale.US));	//Parse the time parameter into LocalTime for comparison
 		for (int i = 0; i < numSlots; i++)
 		{
 			if (slots[i].getDay() == day)
-				if (!(slots[i].getStart().isAfter(parsedTime) || !slots[i].getEnd().isBefore(parsedTime)))
+				if (!(slots[i].getStart().isAfter(parsedTime) || !slots[i].getEnd().isBefore(parsedTime)))	//If start <= time and end >= time, then this time slot is busy
 					return true;
 		}
 		return false;

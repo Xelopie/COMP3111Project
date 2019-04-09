@@ -138,7 +138,7 @@ public class Controller {
     		textAreaConsole.setText("Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
     		return;
     	}
-    	
+    	//This for loop block generates the total number of courses and sections
     	int courseCount = 0, sectionCount = 0;
     	for (Course c : v)
     	{

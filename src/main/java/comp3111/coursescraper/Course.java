@@ -77,11 +77,11 @@ public class Course {
 	public int getNumSections() { return numSections; }
 	public void setNumSections(int numSections) { this.numSections = numSections; }
 	
-	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }
+	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }	//A course has to have at least 1 valid section
 
 	public int getNumValidSections()
 	{
-		int validCount = numSections;
+		int validCount = numSections;	//Using decrement strategy
 		for (int i = 0; i < numSections; i++)
 		{
 			if (!sections[i].isValidSection())
