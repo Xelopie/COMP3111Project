@@ -202,7 +202,7 @@ public class Controller {
     			for (int j = 0; j < sect.getNumSlots(); j++)
 	    		{
 	    			Slot slot = sect.getSlot(j);
-	    			newline += "Slot " + j + " in " + sect + ": " + slot + "\n";
+	    			newline += "Slot " + j + " in " + sect + " : " + slot + "\n";
 	    			//Echo for checking instructors[]
 	    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
 	    		}

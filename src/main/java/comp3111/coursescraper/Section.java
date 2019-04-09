@@ -81,7 +81,7 @@ public class Section {
 	
 	public String toString() { return code + " (" + id +  ")"; }
 	
-	public String getInstructorString()
+	public String getInstructorString()	//Used for echo checking if instructors are read correctly
 	{
 		String instString = "";
 		for (int i = 0; i < numInstructors; i++)
