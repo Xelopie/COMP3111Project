@@ -103,7 +103,7 @@ public class Section {
 		else return false;
 	}
 	
-	public boolean[] containDaySlot() {
+	public boolean[] containsDaySlot() {
 		boolean[] bContainDaySlot = new boolean[6];
 		for (int i = 0; i < numSlots; i++) {
 			for (int j = 0; j < 6; j++) {
