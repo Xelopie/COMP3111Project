@@ -213,13 +213,7 @@ public class Controller {
 
     // Event used to update the info displayed in console in filter tab 
     @FXML
-    void updateConsole() {
-//    	// Test function
-//    	if (cboxAM.isSelected()) 
-//    		textAreaConsole.setText("AM: ON");
-//    	else
-//    		textAreaConsole.setText("AM: OFF");
-    	
+    void updateConsole() {   	
     	// Clear the console first
     	textAreaConsole.setText("");
     	
@@ -239,6 +233,7 @@ public class Controller {
     			!cboxNoEx.isSelected() &&
     			!cboxLabOrTut.isSelected()) 
     	{
+    		// Display all courses normally
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
         	for (Course course : courseList) {
         		String newline = course.getTitle() + "\n";
@@ -259,7 +254,7 @@ public class Controller {
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
         	for (Course course : courseList) {
-        		String newline = course.getTitle() + "\n Attribute: (Debug) " + course.getAttribute() + "\n Exclusion: (Debug) " + course.getExclusion() + "\n";
+        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";
         		
         		/* Bools for filter */
         		boolean isTimeValid = false;
@@ -277,6 +272,7 @@ public class Controller {
 	        		if (course.isCC4Y()) {
 	        			isCCValid = true;
 	        		}
+	        		else continue;
         		}
         		else isCCValid = true;
         		
@@ -285,6 +281,7 @@ public class Controller {
         			if (course.isNoEx()) {
         				isNoExValid = true;
         			}
+        			else continue;
         		}
         		else isNoExValid = true;
         		
@@ -293,42 +290,43 @@ public class Controller {
         			if (course.containsLabOrTut()) {
         				isLabOrTutValid = true;
         			}
+        			else continue;
         		}
         		else isLabOrTutValid = true;
+        		
+        		// Days
+        		boolean[] bContainsDaySection = course.containsDaySection();
+        		for (int day = 0; day < 6; day++) {
+        			if (isDaySelected[day]) {
+        				if(!bContainsDaySection[day]) break;
+        			}
+        			if (day == 5) isDayValid = true;
+        		}
+        		
+	    		// AM/PM 
+	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
+	    			if (course.containsAMPMSection()) {
+	    				isTimeValid = true;
+	    			}
+	    		}
+	    		else if (cboxAM.isSelected()) {
+    				if (course.containsAMSection()) {
+    					isTimeValid = true;
+    				}
+    			}
+	    		else if (cboxPM.isSelected()) {
+	    			if (course.containsPMSection()) {
+	    				isTimeValid = true;
+	    			}
+	    		}
+	    		else isTimeValid = true;
         		
         		for (int i = 0; i < course.getNumSections(); i++)
         		{
     	    		Section section = course.getSection(i);
     	    		
     	    		/* Filter conditions for sections */
-    	    		// AM/PM 
-    	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
-    	    			if (section.containsAMPMSlot()) {
-    	    				isTimeValid = true;
-    	    			}
-    	    		}
-    	    		else if (cboxAM.isSelected()) {
-	    				if (section.containsAMSlot()) {
-	    					isTimeValid = true;
-	    				}
-	    			}
-    	    		else if (cboxPM.isSelected()) {
-    	    			if (section.containsPMSlot()) {
-    	    				isTimeValid = true;
-    	    			}
-    	    		}
-    	    		else isTimeValid = true;
-    	    		
-    	    		// Days
-    	    		boolean[] bContainDaySlot = section.containDaySlot();
-    	    		for (int day = 0; day < 6; day++) { 
-    	    			if (isDaySelected[day]) {
-    	    				if (!bContainDaySlot[day]) break;
-    	    			}
-    	    			if (day == 5) isDayValid = true;
-    	    		}
-    	    		
-    	    		// 
+
     	    		
     	    		// Modify output function
         			for (int j = 0; j < section.getNumSlots(); j++)
@@ -338,7 +336,10 @@ public class Controller {
     	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
-        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid) 
+        		
+        		// If satisfy all the criteria
+        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid)
+        			// Add the line
         			output += newline + "\n";
         	}
         	textAreaConsole.setText(output + "\n");
