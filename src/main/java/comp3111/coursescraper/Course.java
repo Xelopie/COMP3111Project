@@ -1,7 +1,7 @@
 package comp3111.coursescraper;
 
 public class Course {
-	private static final int DEFAULT_MAX_SECTION = 20;
+	private static final int DEFAULT_MAX_SECTION = 35;	//COMP4900 has 33 valid sections
 	
 	private String title ; 
 	private String description ;
@@ -76,5 +76,18 @@ public class Course {
 
 	public int getNumSections() { return numSections; }
 	public void setNumSections(int numSections) { this.numSections = numSections; }
+	
+	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }	//A course has to have at least 1 valid section
 
+	public int getNumValidSections()
+	{
+		int validCount = numSections;	//Using decrement strategy
+		for (int i = 0; i < numSections; i++)
+		{
+			if (!sections[i].isValidSection())
+				validCount--;
+		}
+		return validCount;
+	}
+	
 }

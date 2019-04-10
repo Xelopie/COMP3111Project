@@ -1,6 +1,7 @@
 package comp3111.coursescraper;
 
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -90,17 +91,44 @@ public class Scraper {
 	private void addSection(HtmlElement e, Course c)
 	{
 		e = (HtmlElement)e.getFirstByXPath(".//td");
-		String sect[] = e.asText().split(" ");
+		String sect[] = e.asText().split(" ");	//The text before split looks like "L1 (1234)"
 		Section s = new Section();
 		s.setCode(sect[0]);
-		s.setID(sect[1].substring(1, sect[1].length()-1));
+		s.setID(sect[1].substring(1, sect[1].length()-1));	//Take the id out of the brackets
 		s.setEnrollStatus(false);
 		c.addSection(s);
 	}
 	
+	private void addInstructor(HtmlElement e, Section sect)
+	{
+		List<?> instList = (List<?>)e.getByXPath(".//a");	//Instructor names are contained by all <a> elements that can be found
+		if (instList == null)
+			return;
+		for (HtmlElement instElem: (List<HtmlElement>)instList)
+		{
+			Instructor inst = new Instructor();
+			inst.setName(instElem.asText());
+			sect.addInstructor(inst);
+			
+		}
+	}
+	
 	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
-		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
-		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+		String times[], venue;
+		char probe = e.getChildNodes().get(secondRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
+		//Check for exceptional case where the slots have date specified before slot, then the first 2 char will be integer[0..9]
+		if ((int)probe >= 48 && probe <= 57)
+		{
+			//Date and time are separated by <br> in html, which becomes \n by asText()
+			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split("\n");
+			//After split("\n"), times[0] is the date, times[1] is the time
+			times = times[1].split(" ");
+		}
+		else
+		{
+			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
+		}
+		venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -123,7 +151,6 @@ public class Scraper {
 			
 			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
 
-			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
 			
 			Vector<Course> result = new Vector<Course>();
@@ -146,27 +173,27 @@ public class Scraper {
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
 
-				List<?> sectionsInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				List<?> slotsInfo = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				int slotCount = 0;
-				for (int j = 0; j < sectionsInfo.size(); j++)
+				List<?> htmlInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
+				for (int j = 0; j < htmlInfo.size(); j++)
 				{
-					HtmlElement sectElem = (HtmlElement)sectionsInfo.get(j);
-					addSection(sectElem, c);
+					HtmlElement htmlElem = (HtmlElement)htmlInfo.get(j);
 					
-					HtmlElement slotElem = (HtmlElement)slotsInfo.get(j);
-					addSlot(slotElem, c.getSection(c.getNumSections()-1), false);
-					slotElem = (HtmlElement)slotElem.getNextSibling();
-					if (slotElem != null && !slotElem.getAttribute("class").contains("newsect"))
-						addSlot(slotElem, c.getSection(c.getNumSections()-1), true);
+					addSection(htmlElem, c);
+					addInstructor(htmlElem, c.getSection(j));
+					//By default add at most 2 slots of a section which is enough most of the time
+					addSlot(htmlElem, c.getSection(j), false);
+					htmlElem = (HtmlElement)htmlElem.getNextSibling();
+					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+						addSlot(htmlElem, c.getSection(j), true);
 				}
-				
+
 				result.add(c);
 			}
 			client.close();
 			return result;
 		} catch (Exception e) {
-			System.out.println(e);
+			//This should be the only error throwing operation that would appear on the system console
+			//System.out.println(e);
 		}
 		return null;
 	}
