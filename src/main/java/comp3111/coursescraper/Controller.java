@@ -2,6 +2,8 @@ package comp3111.coursescraper;
 
 
 import java.awt.event.ActionEvent;
+import java.time.LocalTime;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -111,6 +113,8 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    private List<Course> courseList;
+    
     @FXML
     void allSubjectSearch() {
     	
@@ -210,6 +214,9 @@ public class Controller {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     	
+    	// Save the scraped data for later use
+    	courseList = v;
+    	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
     	Label randomLabel = new Label("COMP1022\nL1");
@@ -227,7 +234,9 @@ public class Controller {
     	ap.getChildren().addAll(randomLabel);
     }
     
+    // Button "Select All" function
     @FXML
+    
     void selectAll() {
     	if (buttonSelectAll.getText().equals("Select All")) 
     	{
@@ -267,6 +276,143 @@ public class Controller {
 	    	buttonSelectAll.setText("Select All");
     	}
     }
-    
+
+    // Event used to update the info displayed in console in filter tab 
+    @FXML
+    void updateConsole() {   	
+    	// Clear the console first
+    	textAreaConsole.setText("");
+    	
+    	// Return if courseList is empty
+    	if (courseList == null) return;
+    	
+    	// If all conditions are false -> filter is disabled    	
+    	if (!cboxAM.isSelected() && 
+    			!cboxPM.isSelected() && 
+    			!cboxMon.isSelected() &&
+    			!cboxTue.isSelected() &&
+    			!cboxWed.isSelected() &&
+    			!cboxThur.isSelected() &&
+    			!cboxFri.isSelected() &&
+    			!cboxSat.isSelected() &&
+    			!cboxCC.isSelected() &&
+    			!cboxNoEx.isSelected() &&
+    			!cboxLabOrTut.isSelected()) 
+    	{
+    		// Display all courses normally
+    		String output = "Unfiltered Output: (No conditions have been chosen)\n";
+        	for (Course course : courseList) {
+        		String newline = course.getTitle() + "\n";
+        		for (int i = 0; i < course.getNumSections(); i++)
+        		{
+    	    		Section section = course.getSection(i);
+        			for (int j = 0; j < section.getNumSlots(); j++)
+    	    		{
+    	    			Slot slot = section.getSlot(j);
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
+    	    		}
+        		}
+        		output += newline + "\n";
+        	}
+    		textAreaConsole.setText(output + "\n");
+    	}
+    	// Else some conditions are true -> filter is on
+    	else {
+    		String output = "Filtered Output: (Filter applied)\n";
+        	for (Course course : courseList) {
+        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";
+        		
+        		/* Bools for filter */
+        		boolean isTimeValid = false;
+        		boolean isDayValid = false;
+        		boolean isCCValid = false;
+        		boolean isNoExValid = false;
+        		boolean isLabOrTutValid = false;
+        		
+        		/* Bool array used for Day Filter */
+        		boolean isDaySelected[] = {cboxMon.isSelected(), cboxTue.isSelected(), cboxWed.isSelected(), cboxThur.isSelected(), cboxFri.isSelected(), cboxSat.isSelected()};
+        		
+        		/* Filter conditions for courses */
+        		// CC 4Y
+        		if (cboxCC.isSelected()) {
+	        		if (course.isCC4Y()) {
+	        			isCCValid = true;
+	        		}
+	        		else continue;
+        		}
+        		else isCCValid = true;
+        		
+        		// No Exclusion
+        		if (cboxNoEx.isSelected()) {
+        			if (course.isNoEx()) {
+        				isNoExValid = true;
+        			}
+        			else continue;
+        		}
+        		else isNoExValid = true;
+        		
+        		// Contains Labs or Tutorials
+        		if (cboxLabOrTut.isSelected()) {
+        			if (course.containsLabOrTut()) {
+        				isLabOrTutValid = true;
+        			}
+        			else continue;
+        		}
+        		else isLabOrTutValid = true;
+        		
+        		// Days
+        		boolean[] bContainsDaySection = course.containsDaySection();
+        		for (int day = 0; day < 6; day++) {
+        			if (isDaySelected[day]) {
+        				if(!bContainsDaySection[day]) break;
+        			}
+        			if (day == 5) isDayValid = true;
+        		}
+        		
+	    		// AM/PM 
+	    		if (cboxAM.isSelected() && cboxPM.isSelected()) {
+	    			if (course.containsAMPMSection()) {
+	    				isTimeValid = true;
+	    			}
+	    		}
+	    		else if (cboxAM.isSelected()) {
+    				if (course.containsAMSection()) {
+    					isTimeValid = true;
+    				}
+    			}
+	    		else if (cboxPM.isSelected()) {
+	    			if (course.containsPMSection()) {
+	    				isTimeValid = true;
+	    			}
+	    		}
+	    		else isTimeValid = true;
+        		
+        		for (int i = 0; i < course.getNumSections(); i++)
+        		{
+    	    		Section section = course.getSection(i);
+    	    		
+    	    		/* Filter conditions for sections */
+
+    	    		
+    	    		// Modify output function
+        			for (int j = 0; j < section.getNumSlots(); j++)
+    	    		{
+    	    			Slot slot = section.getSlot(j);
+
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
+    	    		}
+        		}
+        		
+        		// If satisfy all the criteria
+        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid)
+        			// Add the line
+        			output += newline + "\n";
+        	}
+        	textAreaConsole.setText(output + "\n");
+    	}
+    	
+
+    }
+        
 
 }

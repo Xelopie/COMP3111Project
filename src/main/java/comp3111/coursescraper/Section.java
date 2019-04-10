@@ -1,8 +1,11 @@
 package comp3111.coursescraper;
 
 import java.time.LocalTime;
+
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+
 
 public class Section {
 	private static final int DEFAULT_MAX_SLOT = 3;
@@ -134,4 +137,50 @@ public class Section {
 		return false;
 	}
 	
+	
+	/* Helper functions for filter (Task 2) */
+	
+	public boolean containsAMSlot() {
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getStart().isBefore(LocalTime.NOON)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsPMSlot() {
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsAMPMSlot() {
+		for (int i = 0; i < numSlots; i++) {
+			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
+				return true;
+			}
+		}
+		
+		if (containsAMSlot() && containsPMSlot()) {
+			return true;
+		}
+		else return false;
+	}
+	
+	public boolean[] containsDaySlot() {
+		boolean[] bContainDaySlot = new boolean[6];
+		for (int i = 0; i < numSlots; i++) {
+			for (int j = 0; j < 6; j++) {
+				if (slots[i].getDay() == j) {
+					bContainDaySlot[j] = true;
+				}
+			}
+		}
+		return bContainDaySlot;
+	}
+
 }
