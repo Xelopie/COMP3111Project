@@ -102,10 +102,44 @@ public class Course {
 	}
 	
 	public boolean isNoEx() {
-		if (exclusion == null) {
+		if (exclusion.contains("null")) {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean containsAMPMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsAMPMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean containsAMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsAMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean containsPMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsPMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	public boolean[] containsDaySection() {
+		boolean[] bContainsDaySection = new boolean[6];
+		for (int i = 0; i < numSections; i++) {
+			for (int k = 0; k < 6; k++) {
+				bContainsDaySection[k] |= sections[i].containsDaySlot()[k];
+			}
+		}
+		return bContainsDaySection;
 	}
 	
 	public boolean containsLabOrTut() {
