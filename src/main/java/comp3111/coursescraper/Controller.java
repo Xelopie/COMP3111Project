@@ -279,7 +279,7 @@ public class Controller {
 
     // Event used to update the info displayed in console in filter tab 
     @FXML
-    void updateConsole() {   	
+    void filter() {   	
     	// Clear the console first
     	textAreaConsole.setText("");
     	
