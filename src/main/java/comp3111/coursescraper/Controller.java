@@ -4,13 +4,21 @@ package comp3111.coursescraper;
 import java.awt.event.ActionEvent;
 import java.time.LocalTime;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.AnchorPane;
@@ -19,8 +27,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import java.util.Random;
+import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,9 +121,29 @@ public class Controller {
     @FXML
     private TextArea textAreaConsole;
     
+    @FXML
+    private TableView<Section> tViewList;
+
+    @FXML
+    private TableColumn<Section, String> tColumnCode;
+
+    @FXML
+    private TableColumn<Section, String> tColumnSection;
+
+    @FXML
+    private TableColumn<Section, String> tColumnName;
+
+    @FXML
+    private TableColumn<Section, String> tColumnInstructor;
+
+    @FXML
+    private TableColumn<?, ?> tColumnEnroll;
+    
     private Scraper scraper = new Scraper();
     
-    private List<Course> courseList;
+    private List<Course> courseList = new Vector();
+    
+    private List<Course> filteredCourseList = new Vector();
     
     @FXML
     void allSubjectSearch() {
@@ -286,6 +316,9 @@ public class Controller {
     	// Return if courseList is empty
     	if (courseList == null) return;
     	
+    	// Clear the filteredCourseList
+    	filteredCourseList.clear();
+    	
     	// If all conditions are false -> filter is disabled    	
     	if (!cboxAM.isSelected() && 
     			!cboxPM.isSelected() && 
@@ -302,7 +335,7 @@ public class Controller {
     		// Display all courses normally
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
         	for (Course course : courseList) {
-        		String newline = course.getTitle() + "\n";
+        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";
         		for (int i = 0; i < course.getNumSections(); i++)
         		{
     	    		Section section = course.getSection(i);
@@ -314,6 +347,7 @@ public class Controller {
         		}
         		output += newline + "\n";
         	}
+        	filteredCourseList.addAll(courseList);
     		textAreaConsole.setText(output + "\n");
     	}
     	// Else some conditions are true -> filter is on
@@ -390,10 +424,7 @@ public class Controller {
         		for (int i = 0; i < course.getNumSections(); i++)
         		{
     	    		Section section = course.getSection(i);
-    	    		
-    	    		/* Filter conditions for sections */
-
-    	    		
+    	    		   	    		
     	    		// Modify output function
         			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
@@ -404,9 +435,12 @@ public class Controller {
         		}
         		
         		// If satisfy all the criteria
-        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid)
+        		if (isTimeValid && isDayValid && isCCValid && isNoExValid && isLabOrTutValid) {
         			// Add the line
         			output += newline + "\n";
+        			filteredCourseList.add(course);
+        		}
+        		
         	}
         	textAreaConsole.setText(output + "\n");
     	}
@@ -414,5 +448,54 @@ public class Controller {
 
     }
         
+    // Event handling the list (Task 3)
+    @FXML
+    void list() {
+    	if (filteredCourseList == null) {
+    		if (courseList != null) 
+    			filteredCourseList = courseList;
+    		else return;
+    	}
+    	
+    	for (Course course : filteredCourseList) {
+    		for (int i = 0; i < course.getNumSections(); i++) {
+    			// Get the items for the table
+    			tViewList.getItems().add(course.getSection(i));
+    			
+    			/* Set the items for each column */
+    			// Set course code
+    	        tColumnCode.setCellValueFactory(cellData -> {
+    	            Section section = cellData.getValue();
 
+    	            return new ReadOnlyStringWrapper(section.findCourseCode(filteredCourseList));
+    	        });
+    	        tViewList.getColumns().set(0, tColumnCode);
+    	        
+    	        // Set section code
+    	        tColumnSection.setCellValueFactory(cellData -> {
+    	            Section section = cellData.getValue();
+
+    	            return new ReadOnlyStringWrapper(section.getCode());
+    	        });
+    	        tViewList.getColumns().set(1, tColumnSection);
+    	        
+    	        // Set course name
+    	        tColumnName.setCellValueFactory(cellData -> {
+    	            Section section = cellData.getValue();
+
+    	            return new ReadOnlyStringWrapper(section.findCourseName(filteredCourseList));
+    	        });
+    	        tViewList.getColumns().set(2, tColumnName);
+    	        
+    	        // Set instructor
+    	        tColumnInstructor.setCellValueFactory(cellData-> {
+    	        	Section section = cellData.getValue();
+    	        	
+    	        	return new ReadOnlyStringWrapper(section.getInstructorString());
+    	        });
+    	        tViewList.getColumns().set(3, tColumnInstructor);
+    		}
+    	}
+    	
+    }
 }
