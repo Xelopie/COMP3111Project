@@ -3,7 +3,12 @@ package comp3111.coursescraper;
 import java.time.LocalTime;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
 
 
@@ -181,6 +186,31 @@ public class Section {
 			}
 		}
 		return bContainDaySlot;
+	}
+	
+	/* Helper functions for Task 3 */
+	public String findCourseCode(List<Course> courseList) {
+		for (Course course : courseList) {
+			for (int i = 0; i < course.getNumSections(); i++) {
+				if (course.getSection(i).getID().equals(this.id)) {
+					String[] strTitle = course.getTitle().split(" ");
+					return strTitle[0] + strTitle[1];
+				}
+			}
+		}
+		return null;
+	}
+	
+	public String findCourseName(List<Course> courseList) {
+		for (Course course : courseList) {
+			for (int i = 0; i < course.getNumSections(); i++) {
+				if (course.getSection(i).getID().equals(this.id)) {
+					String[] strTitle = course.getTitle().split(" ", 4);
+					return strTitle[3];
+				}
+			}
+		}
+		return null;
 	}
 
 }
