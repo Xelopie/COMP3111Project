@@ -334,7 +334,6 @@ public class Controller {
     // Event used to update the info displayed in console in filter tab 
     @FXML
     void filter() {
-    	System.out.println("Running filter");
     	// Clear the console first
     	textAreaConsole.setText("");
     	
@@ -362,6 +361,7 @@ public class Controller {
         	for (Course course : searchedCourseList) {
         		// newline for debug (disable the real newline when using)
 //        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
+        		
         		// newline for real
         		String newline = course.getTitle() + "\n";
         		
@@ -385,6 +385,7 @@ public class Controller {
         	for (Course course : searchedCourseList) {
         		// newline for debug (disable the real newline when using)
 //        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
+        		
         		// newline for real
         		String newline = course.getTitle() + "\n";
         		
@@ -483,7 +484,6 @@ public class Controller {
     // Event handling the list (Task 3)
     @FXML
     void list() {
-    	System.out.println("Running list");
     	// Run the filter once to show filtered info
     	filter();
     	
