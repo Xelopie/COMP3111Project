@@ -51,7 +51,7 @@
                         </AnchorPane>
                     </content>
                   </Tab>
-                <Tab fx:id="tabFilter" text="Filter">
+                <Tab fx:id="tabFilter" onSelectionChanged="#filter" text="Filter">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="450.0" prefWidth="722.0">
                            <children>
@@ -85,7 +85,7 @@
                                     <TableColumn fx:id="tColumnSection" editable="false" prefWidth="108.0" text="Lecture Section" />
                                   <TableColumn fx:id="tColumnName" editable="false" prefWidth="271.0" text="Course Name" />
                                     <TableColumn fx:id="tColumnInstructor" editable="false" prefWidth="152.0" text="Instructor" />
-                                    <TableColumn fx:id="tColumnEnroll" prefWidth="96.0" text="Enroll" />
+                                    <TableColumn fx:id="tColumnEnroll" onEditCancel="#list" onEditCommit="#list" prefWidth="96.0" text="Enroll" />
                                 </columns>
                               </TableView>
                               <Label layoutX="22.0" layoutY="281.0" text="*Fill the table according to the result of the Filter. If the Filter cannot be correctly implemented, show all result scrapped." />

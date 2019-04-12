@@ -95,7 +95,6 @@ public class Scraper {
 		Section s = new Section();
 		s.setCode(sect[0]);
 		s.setID(sect[1].substring(1, sect[1].length()-1));	//Take the id out of the brackets
-		s.setEnrollStatus(false);
 		c.addSection(s);
 	}
 	
