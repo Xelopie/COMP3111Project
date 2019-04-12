@@ -4,21 +4,21 @@ package comp3111.coursescraper;
 import java.awt.event.ActionEvent;
 import java.time.LocalTime;
 
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.AnchorPane;
@@ -137,13 +137,17 @@ public class Controller {
     private TableColumn<Section, String> tColumnInstructor;
 
     @FXML
-    private TableColumn<?, ?> tColumnEnroll;
+    private TableColumn<Section, CheckBox> tColumnEnroll;
     
     private Scraper scraper = new Scraper();
     
-    private List<Course> courseList = new Vector();
+    // Cache list for searched course to prevent duplicate (Used to maintain the enroll)
+    private List<Course> cacheCourseList = new Vector<Course>();
+    // List we have after search
+    private List<Course> searchedCourseList = new Vector<Course>();
+    // List we have after filter
+    private List<Course> filteredCourseList = new Vector<Course>();
     
-    private List<Course> filteredCourseList = new Vector();
     
     @FXML
     void allSubjectSearch() {
@@ -244,8 +248,28 @@ public class Controller {
     		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     	
+    	/* For-loop added for Task 3 */
     	// Save the scraped data for later use
-    	courseList = v;
+    	// Here I will scan through all the existing courses we have got in (List<Course>)v
+    	// and then add those not on the cache to the courseList and cacheCourseList
+    	// if found the course exist in the cache, get it from the cache instead of getting a new one
+    	searchedCourseList.clear();
+    	for (Course newCourse : v) {
+    		boolean bAddNewCourse = true;
+    		
+    		for (Course oldCourse : cacheCourseList) {
+    			if (newCourse.getTitle().equals(oldCourse.getTitle())) {
+    				bAddNewCourse = false;
+    				searchedCourseList.add(oldCourse);
+    				break;
+    			}
+    		}
+    		
+    		if (bAddNewCourse) {
+    			searchedCourseList.add(newCourse);
+    			cacheCourseList.add(newCourse);
+    		}
+    	}
     	
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
@@ -309,12 +333,13 @@ public class Controller {
 
     // Event used to update the info displayed in console in filter tab 
     @FXML
-    void filter() {   	
+    void filter() {
+    	System.out.println("Running filter");
     	// Clear the console first
     	textAreaConsole.setText("");
     	
     	// Return if courseList is empty
-    	if (courseList == null) return;
+    	if (searchedCourseList.isEmpty()) return;
     	
     	// Clear the filteredCourseList
     	filteredCourseList.clear();
@@ -334,8 +359,12 @@ public class Controller {
     	{
     		// Display all courses normally
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
-        	for (Course course : courseList) {
-        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";
+        	for (Course course : searchedCourseList) {
+        		// newline for debug (disable the real newline when using)
+//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
+        		// newline for real
+        		String newline = course.getTitle() + "\n";
+        		
         		for (int i = 0; i < course.getNumSections(); i++)
         		{
     	    		Section section = course.getSection(i);
@@ -347,14 +376,17 @@ public class Controller {
         		}
         		output += newline + "\n";
         	}
-        	filteredCourseList.addAll(courseList);
+        	filteredCourseList.addAll(searchedCourseList);
     		textAreaConsole.setText(output + "\n");
     	}
     	// Else some conditions are true -> filter is on
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
-        	for (Course course : courseList) {
-        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";
+        	for (Course course : searchedCourseList) {
+        		// newline for debug (disable the real newline when using)
+//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
+        		// newline for real
+        		String newline = course.getTitle() + "\n";
         		
         		/* Bools for filter */
         		boolean isTimeValid = false;
@@ -442,7 +474,7 @@ public class Controller {
         		}
         		
         	}
-        	textAreaConsole.setText(output + "\n");
+        	textAreaConsole.setText(output);
     	}
     	
 
@@ -451,51 +483,97 @@ public class Controller {
     // Event handling the list (Task 3)
     @FXML
     void list() {
-    	if (filteredCourseList == null) {
-    		if (courseList != null) 
-    			filteredCourseList = courseList;
+    	System.out.println("Running list");
+    	// Run the filter once to show filtered info
+    	filter();
+    	
+    	// If the filteredCourseList is empty,
+    	// then fetch the data from courseList
+    	// If courseList is also empty,
+    	// then return (do nothing)    	
+    	if (filteredCourseList.isEmpty()) {
+    		if (!searchedCourseList.isEmpty()) {
+    			filteredCourseList.clear();
+    			filteredCourseList.addAll(searchedCourseList);
+    		}
     		else return;
     	}
     	
+    	// Clear the table every time to prevent duplicate
+    	tViewList.getItems().clear();
+    	
+    	// Add the line "The following sections are enrolled:"
+    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:" + "\n");
+    	
+    	// Add the items into the table
     	for (Course course : filteredCourseList) {
     		for (int i = 0; i < course.getNumSections(); i++) {
+    			Section section = course.getSection(i);
     			// Get the items for the table
-    			tViewList.getItems().add(course.getSection(i));
+    			tViewList.getItems().add(section);
     			
-    			/* Set the items for each column */
-    			// Set course code
-    	        tColumnCode.setCellValueFactory(cellData -> {
-    	            Section section = cellData.getValue();
-
-    	            return new ReadOnlyStringWrapper(section.findCourseCode(filteredCourseList));
-    	        });
-    	        tViewList.getColumns().set(0, tColumnCode);
-    	        
-    	        // Set section code
-    	        tColumnSection.setCellValueFactory(cellData -> {
-    	            Section section = cellData.getValue();
-
-    	            return new ReadOnlyStringWrapper(section.getCode());
-    	        });
-    	        tViewList.getColumns().set(1, tColumnSection);
-    	        
-    	        // Set course name
-    	        tColumnName.setCellValueFactory(cellData -> {
-    	            Section section = cellData.getValue();
-
-    	            return new ReadOnlyStringWrapper(section.findCourseName(filteredCourseList));
-    	        });
-    	        tViewList.getColumns().set(2, tColumnName);
-    	        
-    	        // Set instructor
-    	        tColumnInstructor.setCellValueFactory(cellData-> {
-    	        	Section section = cellData.getValue();
-    	        	
-    	        	return new ReadOnlyStringWrapper(section.getInstructorString());
-    	        });
-    	        tViewList.getColumns().set(3, tColumnInstructor);
+    			section.getEnroll().setOnAction(event -> {
+    				list();
+    			});
     		}
     	}
     	
+		/* Set the items for each column */
+		// Set course code
+        tColumnCode.setCellValueFactory(cellData -> {
+            Section section = cellData.getValue();
+
+            return new ReadOnlyStringWrapper(section.findCourseCode(filteredCourseList));
+        });
+        tViewList.getColumns().set(0, tColumnCode);
+        
+        // Set section code
+        tColumnSection.setCellValueFactory(cellData -> {
+            Section section = cellData.getValue();
+
+            return new ReadOnlyStringWrapper(section.getCode());
+        });
+        tViewList.getColumns().set(1, tColumnSection);
+        
+        // Set course name
+        tColumnName.setCellValueFactory(cellData -> {
+            Section section = cellData.getValue();
+
+            return new ReadOnlyStringWrapper(section.findCourseName(filteredCourseList));
+        });
+        tViewList.getColumns().set(2, tColumnName);
+        
+        // Set instructor
+        tColumnInstructor.setCellValueFactory(cellData -> {
+        	Section section = cellData.getValue();
+        	
+        	return new ReadOnlyStringWrapper(section.getInstructorString());
+        });
+        tViewList.getColumns().set(3, tColumnInstructor);
+        
+        // Set Enroll
+        tColumnEnroll.setCellValueFactory(
+        		new PropertyValueFactory<>("enroll")
+        		);
+        tViewList.getColumns().set(4, tColumnEnroll);
+        
+        // Loop through the table to see if any sections are enrolled
+//        for (int i = 0; i < tViewList.getItems().size(); i++ ) {
+//        	Section section = tViewList.getItems().get(i);
+//        	if (section.getEnroll().isSelected()) {
+//        		textAreaConsole.setText(textAreaConsole.getText() + section.findCourseCode(filteredCourseList) + " " + section.getCode() + "\n");
+//        	}
+//        }
+        
+        for (Course course : cacheCourseList) {
+        	for (int i = 0; i < course.getNumSections(); i++) {
+        		Section section = course.getSection(i);
+        		if (section.getEnroll().isSelected()) {
+        			textAreaConsole.setText(textAreaConsole.getText() + section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n");
+        		}
+        	}
+        }
+    	
     }
+        
 }
