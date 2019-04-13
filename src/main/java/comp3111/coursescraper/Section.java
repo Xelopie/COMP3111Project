@@ -121,6 +121,14 @@ public class Section {
 	public void setNumInstructors(int i) { numInstructors = i; }
 	public int getNumInstructors() { return numInstructors; }
 	
+	public CheckBox getEnroll() {
+		return enroll;
+	}
+	
+	public void setEnroll(CheckBox enroll) {
+		this.enroll.setSelected(enroll.isSelected());
+	}
+	
 	public boolean isValidSection()
 	{
 		//By definition the section is invalid if a section isn't LX, LAX or TX
@@ -210,14 +218,6 @@ public class Section {
 			}
 		}
 		return null;
-	}
-	
-	public CheckBox getEnroll() {
-		return enroll;
-	}
-	
-	public void setEnroll(CheckBox enroll) {
-		this.enroll.setSelected(enroll.isSelected());
 	}
 
 }

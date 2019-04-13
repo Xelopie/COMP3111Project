@@ -488,8 +488,8 @@ public class Controller {
     	filter();
     	
     	// If the filteredCourseList is empty,
-    	// then fetch the data from courseList
-    	// If courseList is also empty,
+    	// then fetch the data from searchCourseList
+    	// If searchCourseList is also empty,
     	// then return (do nothing)    	
     	if (filteredCourseList.isEmpty()) {
     		if (!searchedCourseList.isEmpty()) {
@@ -502,19 +502,16 @@ public class Controller {
     	// Clear the table every time to prevent duplicate
     	tViewList.getItems().clear();
     	
-    	// Add the line "The following sections are enrolled:"
-    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:" + "\n");
-    	
-    	// Add the items into the table
+    	// Add the items of the filteredCourseList into the table
     	for (Course course : filteredCourseList) {
     		for (int i = 0; i < course.getNumSections(); i++) {
     			Section section = course.getSection(i);
     			// Get the items for the table
     			tViewList.getItems().add(section);
-    			
-    			section.getEnroll().setOnAction(event -> {
-    				list();
-    			});
+    			// If the CheckBox hasn't set the OnAction Event 
+    			// set the OnAction Event for the CheckBox -> to re-run the list
+    			if (section.getEnroll().getOnAction() == null)
+    				section.getEnroll().setOnAction(event -> { list(); });
     		}
     	}
     	
@@ -557,14 +554,10 @@ public class Controller {
         		);
         tViewList.getColumns().set(4, tColumnEnroll);
         
-        // Loop through the table to see if any sections are enrolled
-//        for (int i = 0; i < tViewList.getItems().size(); i++ ) {
-//        	Section section = tViewList.getItems().get(i);
-//        	if (section.getEnroll().isSelected()) {
-//        		textAreaConsole.setText(textAreaConsole.getText() + section.findCourseCode(filteredCourseList) + " " + section.getCode() + "\n");
-//        	}
-//        }
+    	// Add the line "The following sections are enrolled:"
+    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:" + "\n");
         
+    	// Feedback which courses you have enrolled
         for (Course course : cacheCourseList) {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
@@ -572,8 +565,6 @@ public class Controller {
         			textAreaConsole.setText(textAreaConsole.getText() + section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n");
         		}
         	}
-        }
-    	
-    }
-        
+        }    	
+    }       
 }
