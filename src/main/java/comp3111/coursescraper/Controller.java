@@ -371,7 +371,7 @@ public class Controller {
         			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
     	    			Slot slot = section.getSlot(j);
-    	    			newline += section + " Slot " + j + " | " + slot + "\n";
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
         		output += newline + "\n";
@@ -462,8 +462,7 @@ public class Controller {
         			for (int j = 0; j < section.getNumSlots(); j++)
     	    		{
     	    			Slot slot = section.getSlot(j);
-
-    	    			newline += section + " Slot " + j + " | " + slot + "\n";
+    	    			newline += section + " Slot " + j + ": " + slot + "\n";
     	    		}
         		}
         		
@@ -553,18 +552,17 @@ public class Controller {
         		new PropertyValueFactory<>("enroll")
         		);
         tViewList.getColumns().set(4, tColumnEnroll);
-        
-    	// Add the line "The following sections are enrolled:"
-    	textAreaConsole.setText(textAreaConsole.getText() + "The following sections are enrolled:" + "\n");
-        
-    	// Feedback which courses you have enrolled
+             
+    	  // Feedback which courses you have enrolled
+    	  String feedback = "The following sections are enrolled:" + "\n";
         for (Course course : cacheCourseList) {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
         		if (section.getEnroll().isSelected()) {
-        			textAreaConsole.setText(textAreaConsole.getText() + section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n");
+        			feedback += section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n";
         		}
         	}
-        }    	
+        } 
+        textAreaConsole.setText(feedback  + "\n" + textAreaConsole.getText());
     }       
 }

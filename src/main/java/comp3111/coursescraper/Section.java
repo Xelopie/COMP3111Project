@@ -10,10 +10,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.CheckBox;
 
+
 /**
  * Stores the information of a section.
  */
-
 public class Section {
 	private static final int DEFAULT_MAX_SLOT = 3;
 	private static final int DEFAULT_MAX_INSTRUCTOR = 4;
@@ -170,6 +170,7 @@ public class Section {
 	 */
 	public int getNumInstructors() { return numInstructors; }
 	
+
 	/**
 	 * Returns the enroll.
 	 * @return the enroll
@@ -178,6 +179,7 @@ public class Section {
 		return enroll;
 	}
 	
+
 	/**
 	 * Sets the enroll.
 	 * @param enroll the CheckBox status to set

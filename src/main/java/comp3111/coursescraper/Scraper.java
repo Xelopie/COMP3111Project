@@ -187,6 +187,7 @@ public class Scraper {
 
 				List<?> htmlInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for (int j = 0; j < htmlInfo.size(); j++)
+
 				{
 					HtmlElement htmlElem = (HtmlElement)htmlInfo.get(j);
 					
