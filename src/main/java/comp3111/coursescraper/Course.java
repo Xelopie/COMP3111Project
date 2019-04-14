@@ -1,5 +1,9 @@
 package comp3111.coursescraper;
 
+/**
+ * Stores the information of a course.
+ */
+
 public class Course {
 	private static final int DEFAULT_MAX_SECTION = 75;	//LANG1003S has 73 valid sections
 	
@@ -10,6 +14,9 @@ public class Course {
 	private Section[] sections;
 	private int numSections;
 	
+	/**
+	 * Default constructor. Initializes the static arrays for Section objects.
+	 */
 	public Course() {
 		sections = new Section[DEFAULT_MAX_SECTION];
 		for (int i = 0; i < DEFAULT_MAX_SECTION; i++)
@@ -19,6 +26,10 @@ public class Course {
 		numSections = 0;
 	}
 	
+	/**
+	 * Adds a section to sections[]
+	 * @param s the section to add
+	 */
 	public void addSection(Section s)
 	{
 		if (numSections >= DEFAULT_MAX_SECTION)
@@ -26,6 +37,11 @@ public class Course {
 		sections[numSections++] = s.clone();
 	}
 	
+	/**
+	 * Returns a section[] item specified by the index
+	 * @param i the index of the section item in the array
+	 * @return the section[i] item
+	 */
 	public Section getSection(int i)
 	{
 		if (i >= 0 && i < numSections)
@@ -34,6 +50,7 @@ public class Course {
 	}
 	
 	/**
+	 * Returns the course title.
 	 * @return the title
 	 */
 	public String getTitle() {
@@ -41,6 +58,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the title.
 	 * @param title the title to set
 	 */
 	public void setTitle(String title) {
@@ -48,6 +66,7 @@ public class Course {
 	}
 
 	/**
+	 * Returns the course description.
 	 * @return the description
 	 */
 	public String getDescription() {
@@ -55,6 +74,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the course description.
 	 * @param description the description to set
 	 */
 	public void setDescription(String description) {
@@ -62,6 +82,7 @@ public class Course {
 	}
 
 	/**
+	 * Returns the course exclusion.
 	 * @return the exclusion
 	 */
 	public String getExclusion() {
@@ -69,6 +90,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the course exclusion.
 	 * @param exclusion the exclusion to set
 	 */
 	public void setExclusion(String exclusion) {
@@ -76,6 +98,7 @@ public class Course {
 	}
 
 	/**
+	 * Returns the course attribute.
 	 * @return the attribute
 	 */
 	public String getAttribute() {
@@ -83,16 +106,28 @@ public class Course {
 	}
 	
 	/**
+	 * Sets the course attribute.
 	 * @param attribute the attribute to set
 	 */
 	public void setAttribute(String attribute) {
 		this.attribute = attribute;
 	}
 	
+	/**
+	 * Returns the number of sections.
+	 * @return the numSections
+	 */
 	public int getNumSections() { return numSections; }
+	/**
+	 * Sets the numSections
+	 * @param numSections the numSections to set
+	 */
 	public void setNumSections(int numSections) { this.numSections = numSections; }
 	
-
+	/**
+	 * Returns a boolean value on whether the course is valid. A valid course has at least 1 valid section.
+	 * @return boolean - is the course valid
+	 */
 	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }	//A course has to have at least 1 valid section
 
 	/* Helper functions for filter (Task 2) */
@@ -153,7 +188,10 @@ public class Course {
 		return false;
 	}
 
-
+	/**
+	 * Returns the number of valid sections in this course.
+	 * @return the number of valid sections in this course
+	 */
 	public int getNumValidSections()
 	{
 		int validCount = numSections;	//Using decrement strategy

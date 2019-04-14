@@ -15,7 +15,7 @@ import java.util.Vector;
 
 
 /**
- * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
+ * WebScraper provides a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
  * the client will go to the default url and parse the page by looking at the HTML DOM.  
  * <br>
  * In this particular sample code, it access to HKUST class schedule and quota page (COMP). 
@@ -145,6 +145,13 @@ public class Scraper {
 
 	}
 
+	/**
+	 * Returns a List with Course containers scraped from an URL combined from the 3 parameters
+	 * @param baseurl from the Base URL text field
+	 * @param term from the Term text field
+	 * @param sub from the Subject text field
+	 * @return a List with Course containers scraped from the combined URL
+	 */
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {

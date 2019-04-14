@@ -10,7 +10,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.CheckBox;
 
-
+/**
+ * Stores the information of a section.
+ */
 
 public class Section {
 	private static final int DEFAULT_MAX_SLOT = 3;
@@ -24,7 +26,9 @@ public class Section {
 	private int numInstructors;
 	private CheckBox enroll;
 		
-	
+	/**
+	 * Default constructor. Initializes the static arrays for Slot and Instructor objects.
+	 */
 	public Section()
 	{
 		slots = new Slot[DEFAULT_MAX_SLOT];
@@ -37,6 +41,10 @@ public class Section {
 		enroll = new CheckBox("");
 	}
 	
+	/**
+	 * Overrides the shallow copy default clone().
+	 * @return A section item clone of itself by deep copy
+	 */
 	@Override
 	public Section clone()
 	{
@@ -63,6 +71,10 @@ public class Section {
 		return sect;
 	}
 	
+	/**
+	 * Adds a slot to slots[]
+	 * @param s the slot to add
+	 */
 	public void addSlot(Slot s) {
 		if (numSlots >= DEFAULT_MAX_SLOT)
 			return;
@@ -75,6 +87,10 @@ public class Section {
 		return null;
 	}
 	
+	/**
+	 * Adds an instructor to instructors[]
+	 * @param inst the instructor to add
+	 */
 	public void addInstructor(Instructor inst)
 	{
 		if (numInstructors >= DEFAULT_MAX_INSTRUCTOR)
@@ -89,8 +105,16 @@ public class Section {
 		return null;
 	}
 	
+	/**
+	 * Can be called implicitly when slot is needed as String.
+	 * @return the instructor in String
+	 */
 	public String toString() { return code + " (" + id +  ")"; }
 	
+	/**
+	 * Returns a String containing all instructor items
+	 * @return all instructor items in this section object in String
+	 */
 	public String getInstructorString()	//Used for echo checking if instructors are read correctly
 	{
 		String instString = "";
@@ -102,33 +126,70 @@ public class Section {
 	}
 	
 	/**
+	 * Returns the numSlots.
 	 * @return the numSlots
 	 */
-	
 	public int getNumSlots() { return numSlots; }
 
 	/**
-	 * @param numSlots the numSlots to set
+	 * Sets the numSlots.
+	 * @param numSlots the number of slots to set
 	 */
 	public void setNumSlots(int numSlots) { this.numSlots = numSlots; }
 	
+	/**
+	 * Sets the section ID.
+	 * @param s the id to set
+	 */
 	public void setID(String s) { id = s; }
+	/**
+	 * Returns the course ID.
+	 * @return the ID
+	 */
 	public String getID() { return id; }
 	
-	public void setCode(String str) { code = str; }
+	/**
+	 * Sets the section code.
+	 * @param s the code to set
+	 */
+	public void setCode(String s) { code = s; }
+	/**
+	 * Returns the course code.
+	 * @return the code
+	 */
 	public String getCode() { return code; }
 	
+	/**
+	 * Sets the numInstructors.
+	 * @param i the number of instructors to set
+	 */
 	public void setNumInstructors(int i) { numInstructors = i; }
+	/**
+	 * Returns the numInstructors.
+	 * @return the numInstructors
+	 */
 	public int getNumInstructors() { return numInstructors; }
 	
+	/**
+	 * Returns the enroll.
+	 * @return the enroll
+	 */
 	public CheckBox getEnroll() {
 		return enroll;
 	}
 	
+	/**
+	 * Sets the enroll.
+	 * @param enroll the CheckBox status to set
+	 */
 	public void setEnroll(CheckBox enroll) {
 		this.enroll.setSelected(enroll.isSelected());
 	}
 	
+	/**
+	 * Returns a boolean value depending on whether the section is valid. A valid section contains "L", "LA", or "T" in the code.
+	 * @return boolean - is the section valid
+	 */
 	public boolean isValidSection()
 	{
 		//By definition the section is invalid if a section isn't LX, LAX or TX
@@ -137,6 +198,12 @@ public class Section {
 		return false;
 	}
 	
+	/**
+	 * Returns a boolean value depending on whether there are slots that covers the time parameters. Defined as start time is earlier or equal to the time, AND end time is equal to or after the time. 
+	 * @param day the day being asked
+	 * @param time the time being asked
+	 * @return boolean - is the section busy at the time specified by the parameters
+	 */
 	public boolean isBusyAt(int day, String time)
 	{
 		LocalTime parsedTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mma", Locale.US));	//Parse the time parameter into LocalTime for comparison
