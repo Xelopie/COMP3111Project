@@ -119,9 +119,9 @@ public class Scraper {
 		//Check for exceptional case where the slots have date specified before slot, then the first 2 char will be integer[0..9]
 		if ((int)probe >= 48 && (int)probe <= 57)
 		{
-			//Date and time are separated by <br> in html, which becomes \n by asText()
+			//Date and time are separated by <br> in html, which becomes "\n" by asText()
 			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split("\n");
-			//After split("\n"), times[0] is the date, times[1] is the time
+			//After split("\n"), times[0] is the date, times[1] is the time we want to split again
 			times = times[1].split(" ");
 		}
 		else
@@ -146,11 +146,11 @@ public class Scraper {
 	}
 
 	/**
-	 * Returns a List with Course containers scraped from an URL combined from the 3 parameters
+	 * Returns a List containing Course scraped from an URL combined from the 3 parameters
 	 * @param baseurl from the Base URL text field
 	 * @param term from the Term text field
 	 * @param sub from the Subject text field
-	 * @return a List with Course containers scraped from the combined URL
+	 * @return a List containing Course scraped from the combined URL
 	 */
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
@@ -187,19 +187,19 @@ public class Scraper {
 
 				List<?> htmlInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for (int j = 0; j < htmlInfo.size(); j++)
-
 				{
 					HtmlElement htmlElem = (HtmlElement)htmlInfo.get(j);
 					
 					addSection(htmlElem, c);
 					addInstructor(htmlElem, c.getSection(j));
-					//By default add at most 2 slots of a section which is enough most of the time
 					addSlot(htmlElem, c.getSection(j), false);
 					htmlElem = (HtmlElement)htmlElem.getNextSibling();
-					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))	//If the section has a second slot, and the second slot does not contain "newsect"
 					{
 						addSlot(htmlElem, c.getSection(j), true);
 						htmlElem = (HtmlElement)htmlElem.getNextSibling();
+						//If the section has a third slot. At this point the chance is that the section has more than 3 slots.
+						//However, slot is defined to have a max size of 3
 						if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
 						{
 							addSlot(htmlElem, c.getSection(j), true);
