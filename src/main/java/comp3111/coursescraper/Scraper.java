@@ -15,7 +15,7 @@ import java.util.Vector;
 
 
 /**
- * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
+ * WebScraper provides a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
  * the client will go to the default url and parse the page by looking at the HTML DOM.  
  * <br>
  * In this particular sample code, it access to HKUST class schedule and quota page (COMP). 
@@ -112,22 +112,23 @@ public class Scraper {
 		}
 	}
 	
-	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
+	private void addSlot(HtmlElement e, Section sect, boolean nonFirstRow)	//Boolean parameter originally named secondRow, changed to suit better for max number of slots being 3
+	{
 		String times[], venue;
-		char probe = e.getChildNodes().get(secondRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
+		char probe = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
 		//Check for exceptional case where the slots have date specified before slot, then the first 2 char will be integer[0..9]
-		if ((int)probe >= 48 && probe <= 57)
+		if ((int)probe >= 48 && (int)probe <= 57)
 		{
-			//Date and time are separated by <br> in html, which becomes \n by asText()
-			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split("\n");
-			//After split("\n"), times[0] is the date, times[1] is the time
+			//Date and time are separated by <br> in html, which becomes "\n" by asText()
+			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split("\n");
+			//After split("\n"), times[0] is the date, times[1] is the time we want to split again
 			times = times[1].split(" ");
 		}
 		else
 		{
-			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
+			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
 		}
-		venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+		venue = e.getChildNodes().get(nonFirstRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -144,6 +145,13 @@ public class Scraper {
 
 	}
 
+	/**
+	 * Returns a List containing Course scraped from an URL combined from the 3 parameters
+	 * @param baseurl from the Base URL text field
+	 * @param term from the Term text field
+	 * @param sub from the Subject text field
+	 * @return a List containing Course scraped from the combined URL
+	 */
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {
@@ -185,11 +193,19 @@ public class Scraper {
 					
 					addSection(htmlElem, c);
 					addInstructor(htmlElem, c.getSection(j));
-					//By default add at most 2 slots of a section which is enough most of the time
 					addSlot(htmlElem, c.getSection(j), false);
 					htmlElem = (HtmlElement)htmlElem.getNextSibling();
-					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))	//If the section has a second slot, and the second slot does not contain "newsect"
+					{
 						addSlot(htmlElem, c.getSection(j), true);
+						htmlElem = (HtmlElement)htmlElem.getNextSibling();
+						//If the section has a third slot. At this point the chance is that the section has more than 3 slots.
+						//However, slot is defined to have a max size of 3
+						if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+						{
+							addSlot(htmlElem, c.getSection(j), true);
+						}
+					}
 				}
 
 				result.add(c);
