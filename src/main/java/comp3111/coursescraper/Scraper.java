@@ -95,7 +95,6 @@ public class Scraper {
 		Section s = new Section();
 		s.setCode(sect[0]);
 		s.setID(sect[1].substring(1, sect[1].length()-1));	//Take the id out of the brackets
-		s.setEnrollStatus(false);
 		c.addSection(s);
 	}
 	
@@ -113,22 +112,23 @@ public class Scraper {
 		}
 	}
 	
-	private void addSlot(HtmlElement e, Section sect, boolean secondRow) {
+	private void addSlot(HtmlElement e, Section sect, boolean nonFirstRow)	//Boolean parameter originally named secondRow, changed to suit better for max number of slots being 3
+	{
 		String times[], venue;
-		char probe = e.getChildNodes().get(secondRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
+		char probe = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
 		//Check for exceptional case where the slots have date specified before slot, then the first 2 char will be integer[0..9]
-		if ((int)probe >= 48 && probe <= 57)
+		if ((int)probe >= 48 && (int)probe <= 57)
 		{
 			//Date and time are separated by <br> in html, which becomes \n by asText()
-			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split("\n");
+			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split("\n");
 			//After split("\n"), times[0] is the date, times[1] is the time
 			times = times[1].split(" ");
 		}
 		else
 		{
-			times = e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
+			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
 		}
-		venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+		venue = e.getChildNodes().get(nonFirstRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -164,17 +164,23 @@ public class Scraper {
 				
 				List<?> popupdetailslist = (List<?>) htmlItem.getByXPath(".//div[@class='popupdetail']/table/tbody/tr");
 				HtmlElement exclusion = null;
+				HtmlElement attribute = null;
 				for ( HtmlElement e : (List<HtmlElement>)popupdetailslist) {
 					HtmlElement t = (HtmlElement) e.getFirstByXPath(".//th");
 					HtmlElement d = (HtmlElement) e.getFirstByXPath(".//td");
 					if (t.asText().equals("EXCLUSION")) {
 						exclusion = d;
 					}
+					if (t.asText().equals("ATTRIBUTES")) {
+						attribute = d;
+					}
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
+				c.setAttribute((attribute == null ? "null" : attribute.asText()));
 
 				List<?> htmlInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
 				for (int j = 0; j < htmlInfo.size(); j++)
+
 				{
 					HtmlElement htmlElem = (HtmlElement)htmlInfo.get(j);
 					
@@ -184,7 +190,14 @@ public class Scraper {
 					addSlot(htmlElem, c.getSection(j), false);
 					htmlElem = (HtmlElement)htmlElem.getNextSibling();
 					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+					{
 						addSlot(htmlElem, c.getSection(j), true);
+						htmlElem = (HtmlElement)htmlElem.getNextSibling();
+						if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+						{
+							addSlot(htmlElem, c.getSection(j), true);
+						}
+					}
 				}
 
 				result.add(c);

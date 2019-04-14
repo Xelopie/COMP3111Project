@@ -47,11 +47,4 @@ public class ItemTest {
 		assertEquals(c.getExclusion(), "Test Exclusion");
 	}
 	
-	@Test 
-	public void testAddSlot() {
-		Course c = new Course();
-		Slot s = new Slot();
-		c.addSlot(s);
-		assertTrue(c.getSlot(0) != null);
-	}
 }
