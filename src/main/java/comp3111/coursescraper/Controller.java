@@ -271,21 +271,29 @@ public class Controller {
     		}
     	}
     	
+    	timetableUpdate();
+    }
+    
+    private void timetableUpdate()
+    {
     	//Add a random block on Saturday
     	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
     	Label randomLabel = new Label("COMP1022\nL1");
     	Random r = new Random();
     	double start = (r.nextInt(10) + 1) * 20 + 40;
-
+    	//Define: 09:00 starts at x = n * 100 + 102, y = 40
+    	//Each day has width x = 100 
+    	//Each hour has height y = 20
     	randomLabel.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-    	randomLabel.setLayoutX(600.0);
-    	randomLabel.setLayoutY(start);
+    	randomLabel.setLayoutX(102.0);
+    	randomLabel.setLayoutY(40);
     	randomLabel.setMinWidth(100.0);
     	randomLabel.setMaxWidth(100.0);
     	randomLabel.setMinHeight(60);
     	randomLabel.setMaxHeight(60);
-    
+    	
     	ap.getChildren().addAll(randomLabel);
+   	
     }
     
     // Button "Select All" function
