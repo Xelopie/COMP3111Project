@@ -278,15 +278,14 @@ public class Controller {
     
     public static final int COLUMN_START = 40, COLUMN_WIDTH = 99, ROW_START = 102, ROW_HEIGHT = 20;
     public static final LocalTime START_TIME = LocalTime.parse("09:00AM", DateTimeFormatter.ofPattern("hh:mma", Locale.US));
-     
+    
     private void timetableUpdate()
     {
-    	List<Slot>[] labelSlotLists = new List[6];
-     	List<String>[] labelSectLists = new List[6];
+    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
+     	List<Label>[] labelLists = new List[6];
      	for (int i = 0; i < 6; i++)
      	{
-     		labelSlotLists[i] = new ArrayList<Slot>();
-     		labelSectLists[i] = new LinkedList<String>();
+     		labelLists[i] = new ArrayList<Label>();
      	}
      	for (Course course : cacheCourseList)
      	{
@@ -297,47 +296,49 @@ public class Controller {
         		{
         			for (int j = 0; j < section.getNumSlots(); j++)
         			{
-        				labelSlotLists[section.getSlot(j).getDay()].add(section.getSlot(j));
-        				labelSectLists[section.getSlot(j).getDay()].add(course.getTitle().substring(0, course.getTitle().indexOf("-")) + "\n" + section.getCode());
-        			}
+        				Label label = new Label(course.getTitle().substring(0, course.getTitle().indexOf("-")) + "\n" + section.getCode());
+            			label.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE, CornerRadii.EMPTY, Insets.EMPTY)));
+            			label.setLayoutX(ROW_START + 100 * section.getSlot(j).getDay());
+            			label.setLayoutY(COLUMN_START + ROW_HEIGHT * Duration.between(START_TIME, section.getSlot(j).getStart()).toMinutes() / 60.0);
+            			label.setMinWidth(COLUMN_WIDTH);
+            			label.setMaxWidth(COLUMN_WIDTH);
+            			
+            			double slotHeight = Duration.between(section.getSlot(j).getStart(), section.getSlot(j).getEnd()).toMinutes() / 60.0;
+            			if (slotHeight <= 1)
+            			{
+            				String c[];
+            				c = label.getText().split("\n");
+            				label.setText(c[0] + c[1]);
+            			}
+            			label.setMinHeight(ROW_HEIGHT * slotHeight);
+            	    	label.setMaxHeight(ROW_HEIGHT * slotHeight);
+            	    	labelLists[section.getSlot(j).getDay()].add(label);
+            	    }
         		}
         		else
         		{
-        			for (int j = 0; j < section.getNumSlots(); j++)
+        			String courseTitle = course.getTitle().substring(0, course.getTitle().indexOf("-")), sectionCode = section.getCode();
+        			for (int j = 0; j < ap.getChildren().size(); j++)
         			{
-        				labelSlotLists[section.getSlot(j).getDay()].remove(section.getSlot(j));
-        				labelSectLists[section.getSlot(j).getDay()].remove(course.getTitle().substring(0, course.getTitle().indexOf("-")) + "\n" + section.getCode());
+        				if (ap.getChildren().get(j).toString().contains(courseTitle + "\n" + sectionCode) || ap.getChildren().get(j).toString().contains(courseTitle + sectionCode))
+        				{
+        					ap.getChildren().remove(ap.getChildren().get(j));
+        				}
         			}
-        		}
+    			}
         	}
         }
      	
      	//Define: 09:00 starts at x = n * 100 + 102, y = 40
     	//Each day has width x = 100 
     	//Each hour has height y = 20
-    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
-     	for (int i = 0; i < 6; i++)
-    	{
-    		for (int j = 0; j < labelSlotLists[i].size(); j++)
-    		{
-    			Label label = new Label(labelSectLists[i].get(j));
-    			label.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE, CornerRadii.EMPTY, Insets.EMPTY)));
-    			label.setLayoutX(ROW_START + 100 * i);
-    			label.setLayoutY(COLUMN_START + ROW_HEIGHT * Duration.between(START_TIME, labelSlotLists[i].get(j).getStart()).toMinutes() / 60);
-    			label.setMinWidth(COLUMN_WIDTH);
-    			label.setMaxWidth(COLUMN_WIDTH);
-    			float slotHeight = Duration.between(labelSlotLists[i].get(j).getStart(), labelSlotLists[i].get(j).getEnd()).toMinutes() / 60;
-    			if (slotHeight < 2)
-    			{
-    				String c[];
-    				c = label.getText().split("\n");
-    				label.setText(c[0] + " " + c[1]);
-    			}
-    			label.setMinHeight(ROW_HEIGHT * slotHeight);
-    	    	label.setMaxHeight(ROW_HEIGHT * slotHeight);
-    	    	ap.getChildren().addAll(label);
-    		}
-    	}
+     	for (List<Label> labelList: labelLists)
+     	{
+     		for (Label label: labelList)
+     		{
+     			ap.getChildren().addAll(label);
+     		}
+     	}
     }
     
     // Button "Select All" function
