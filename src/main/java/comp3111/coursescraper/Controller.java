@@ -2,7 +2,9 @@ package comp3111.coursescraper;
 
 
 import java.awt.event.ActionEvent;
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -33,10 +35,12 @@ import java.util.Random;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class Controller {
-
+	
     @FXML
     private Tab tabMain;
 
@@ -148,7 +152,6 @@ public class Controller {
     // List we have after filter
     private List<Course> filteredCourseList = new Vector<Course>();
     
-    
     @FXML
     void allSubjectSearch() {
     	
@@ -187,7 +190,7 @@ public class Controller {
     	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	List<String> instList = new ArrayList<String>();
-    	//This block of for loop generates a list of all instructors that shows up in the search
+    	//This block of for loop generates a list of all distinct instructors that shows up in the search
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -271,29 +274,70 @@ public class Controller {
     		}
     	}
     	
-    	timetableUpdate();
     }
     
+    public static final int COLUMN_START = 40, COLUMN_WIDTH = 99, ROW_START = 102, ROW_HEIGHT = 20;
+    public static final LocalTime START_TIME = LocalTime.parse("09:00AM", DateTimeFormatter.ofPattern("hh:mma", Locale.US));
+     
     private void timetableUpdate()
     {
-    	//Add a random block on Saturday
-    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
-    	Label randomLabel = new Label("COMP1022\nL1");
-    	Random r = new Random();
-    	double start = (r.nextInt(10) + 1) * 20 + 40;
-    	//Define: 09:00 starts at x = n * 100 + 102, y = 40
+    	List<Slot>[] labelSlotLists = new List[6];
+     	List<String>[] labelSectLists = new List[6];
+     	for (int i = 0; i < 6; i++)
+     	{
+     		labelSlotLists[i] = new ArrayList<Slot>();
+     		labelSectLists[i] = new LinkedList<String>();
+     	}
+     	for (Course course : cacheCourseList)
+     	{
+        	for (int i = 0; i < course.getNumSections(); i++)
+        	{
+        		Section section = course.getSection(i);
+        		if (section.getEnroll().isSelected())
+        		{
+        			for (int j = 0; j < section.getNumSlots(); j++)
+        			{
+        				labelSlotLists[section.getSlot(j).getDay()].add(section.getSlot(j));
+        				labelSectLists[section.getSlot(j).getDay()].add(course.getTitle().substring(0, course.getTitle().indexOf("-")) + "\n" + section.getCode());
+        			}
+        		}
+        		else
+        		{
+        			for (int j = 0; j < section.getNumSlots(); j++)
+        			{
+        				labelSlotLists[section.getSlot(j).getDay()].remove(section.getSlot(j));
+        				labelSectLists[section.getSlot(j).getDay()].remove(course.getTitle().substring(0, course.getTitle().indexOf("-")) + "\n" + section.getCode());
+        			}
+        		}
+        	}
+        }
+     	
+     	//Define: 09:00 starts at x = n * 100 + 102, y = 40
     	//Each day has width x = 100 
     	//Each hour has height y = 20
-    	randomLabel.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-    	randomLabel.setLayoutX(102.0);
-    	randomLabel.setLayoutY(40);
-    	randomLabel.setMinWidth(100.0);
-    	randomLabel.setMaxWidth(100.0);
-    	randomLabel.setMinHeight(60);
-    	randomLabel.setMaxHeight(60);
-    	
-    	ap.getChildren().addAll(randomLabel);
-   	
+    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
+     	for (int i = 0; i < 6; i++)
+    	{
+    		for (int j = 0; j < labelSlotLists[i].size(); j++)
+    		{
+    			Label label = new Label(labelSectLists[i].get(j));
+    			label.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE, CornerRadii.EMPTY, Insets.EMPTY)));
+    			label.setLayoutX(ROW_START + 100 * i);
+    			label.setLayoutY(COLUMN_START + ROW_HEIGHT * Duration.between(START_TIME, labelSlotLists[i].get(j).getStart()).toMinutes() / 60);
+    			label.setMinWidth(COLUMN_WIDTH);
+    			label.setMaxWidth(COLUMN_WIDTH);
+    			float slotHeight = Duration.between(labelSlotLists[i].get(j).getStart(), labelSlotLists[i].get(j).getEnd()).toMinutes() / 60;
+    			if (slotHeight < 2)
+    			{
+    				String c[];
+    				c = label.getText().split("\n");
+    				label.setText(c[0] + " " + c[1]);
+    			}
+    			label.setMinHeight(ROW_HEIGHT * slotHeight);
+    	    	label.setMaxHeight(ROW_HEIGHT * slotHeight);
+    	    	ap.getChildren().addAll(label);
+    		}
+    	}
     }
     
     // Button "Select All" function
@@ -572,5 +616,6 @@ public class Controller {
         	}
         } 
         textAreaConsole.setText(feedback  + "\n" + textAreaConsole.getText());
+        timetableUpdate();
     }       
 }
