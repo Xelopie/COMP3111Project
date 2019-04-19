@@ -36,7 +36,6 @@ import javafx.util.Callback;
 import java.util.Random;
 import java.util.Vector;
 
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.util.ArrayList;
 import java.util.Collections;
