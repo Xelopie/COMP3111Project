@@ -216,7 +216,7 @@ public class Scraper {
 			//This should be the only error throwing operation that would appear on the system console
 			//System.out.println(e);
 		}
-		return null;
+		return null; 
 	}
 	/**
 	 * Returns a list containing subjects' name from an URL combined from 2 parameters
