@@ -7,6 +7,10 @@ import java.time.LocalTime;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -31,6 +35,9 @@ import javafx.util.Callback;
 
 import java.util.Random;
 import java.util.Vector;
+
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -139,6 +146,8 @@ public class Controller {
     @FXML
     private TableColumn<Section, CheckBox> tColumnEnroll;
     
+    private Service<Integer> DoWork;
+    
     private Scraper scraper = new Scraper();
     
     // Cache list for searched course to prevent duplicate (Used to maintain the enroll)
@@ -148,12 +157,75 @@ public class Controller {
     // List we have after filter
     private List<Course> filteredCourseList = new Vector<Course>();
     
+    /**
+     * Print out all the info of a course
+     * @param c from List of courses scrapped
+     */
+    void ListDetail(Course c) {
+    	String newline = c.getTitle() + "\n";
+		for (int i = 0; i < c.getNumSections(); i++){
+    		Section sect = c.getSection(i);
+			for (int j = 0; j < sect.getNumSlots(); j++){
+    			Slot slot = sect.getSlot(j);
+    			newline += sect + " Slot " + j + " | " + slot + "\n";
+    			//Echo for checking instructors[]
+    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
+    		}
+		}
+		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+		return;
+    }
     
     @FXML
-    void allSubjectSearch() {
+    void allSubjectSearch(){
+    	List<Course> AllCourseList = new Vector<Course>();
+    	List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
+    	if(Subjects == null) {textAreaConsole.setText("Something wrong with BASE URL or Term.");};
+    	int AllSubjectCount = Subjects.size(); 
     	
-    }
+    	DoWork = new Service<Integer>() {
 
+			@Override
+			protected Task<Integer> createTask() {
+				
+				return new Task<Integer>() {
+
+					@Override
+					protected Integer call() throws Exception {
+						int sectionCount = 0;
+							for(int i=0;i<AllSubjectCount;++i) {//search and get all subjects' info
+					    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(), Subjects.get(i));
+					    		for(Course c: temp) {
+					    			if (c.isValidCourse()) {
+					        			sectionCount  += c.getNumValidSections();
+					        			AllCourseList.add(c);
+					        			}
+					    		}
+					    		updateProgress(i+1, AllSubjectCount);
+					    		System.out.println("SUBJECT is done:" + i);
+							}
+						return sectionCount;
+					}
+					
+				};
+			}	
+    	};
+    	progressbar.progressProperty().bind(DoWork.progressProperty());
+    	DoWork.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
+
+			@Override
+			public void handle(WorkerStateEvent event) {
+				textAreaConsole.setText("Total Number of Categories:"+ AllSubjectCount +"\n");
+		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + AllCourseList.size() + "\nTotal Number of difference sections in this search: " + DoWork.getValue() + "\n");
+
+		    	for (Course c : AllCourseList) {
+		    		ListDetail(c);
+		    	}			
+			} 	
+    	});
+    	DoWork.restart();   	   		
+    }
+    
     @FXML
     void findInstructorSfq() {
     	buttonInstructorSfq.setDisable(true);
@@ -233,19 +305,7 @@ public class Controller {
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);
     	    	
     	for (Course c : v) {
-    		String newline = c.getTitle() + "\n";
-    		for (int i = 0; i < c.getNumSections(); i++)
-    		{
-	    		Section sect = c.getSection(i);
-    			for (int j = 0; j < sect.getNumSlots(); j++)
-	    		{
-	    			Slot slot = sect.getSlot(j);
-	    			newline += sect + " Slot " + j + " | " + slot + "\n";
-	    			//Echo for checking instructors[]
-	    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
-	    		}
-    		}
-    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
+    		ListDetail(c);
     	}
     	
     	/* For-loop added for Task 3 */
