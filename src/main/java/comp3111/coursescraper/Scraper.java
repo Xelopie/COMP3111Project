@@ -218,5 +218,26 @@ public class Scraper {
 		}
 		return null;
 	}
-
+	/**
+	 * Returns a list containing subjects' name from an URL combined from 2 parameters
+	 * @param baseurl from the Base URL text field
+	 * @param term from the Term text field
+	 * @return a List containing Subjects scraped from the combined URL
+	 */
+	public List<String> getSubjects(String baseurl, String term){
+		try {
+			HtmlPage page = client.getPage(baseurl + term + "/subject/ACCT"); // (baseurl + term + "/") should be used here but the site is down right now
+			List<?> items = (List<?>) page.getByXPath("//div[@class='depts']/a");
+			Vector<String> result =  new Vector<String>();
+			for(int i=0; i<items.size();++i) {
+				HtmlElement htmlItem = (HtmlElement) items.get(i);
+				String subj = htmlItem.asText();
+				result.add(subj);
+			}
+			return result;		
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
 }
