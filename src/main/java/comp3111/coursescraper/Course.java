@@ -125,10 +125,25 @@ public class Course {
 	public void setNumSections(int numSections) { this.numSections = numSections; }
 	
 	/**
-	 * Returns a boolean value on whether the course is valid. A valid course has at least 1 valid section.
-	 * @return boolean - is the course valid
+	 * Returns true if the course is valid. A valid course has at least 1 valid section.
+	 * @return true if this is a valid course
 	 */
 	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }	//A course has to have at least 1 valid section
+
+	/**
+	 * Returns the number of valid sections in this course.
+	 * @return the number of valid sections in this course
+	 */
+	public int getNumValidSections()
+	{
+		int validCount = numSections;	//Using decrement strategy
+		for (int i = 0; i < numSections; i++)
+		{
+			if (!sections[i].isValidSection())
+				validCount--;
+		}
+		return validCount;
+	}
 
 	/* Helper functions for filter (Task 2) */
 	
@@ -186,21 +201,6 @@ public class Course {
 				return true;
 		}
 		return false;
-	}
-
-	/**
-	 * Returns the number of valid sections in this course.
-	 * @return the number of valid sections in this course
-	 */
-	public int getNumValidSections()
-	{
-		int validCount = numSections;	//Using decrement strategy
-		for (int i = 0; i < numSections; i++)
-		{
-			if (!sections[i].isValidSection())
-				validCount--;
-		}
-		return validCount;
 	}
 	
 }
