@@ -2,7 +2,9 @@ package comp3111.coursescraper;
 
 
 import java.awt.event.ActionEvent;
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -27,16 +29,19 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.geometry.Insets;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 
 import java.util.Random;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class Controller {
-
+	
     @FXML
     private Tab tabMain;
 
@@ -148,7 +153,6 @@ public class Controller {
     // List we have after filter
     private List<Course> filteredCourseList = new Vector<Course>();
     
-    
     @FXML
     void allSubjectSearch() {
     	
@@ -187,7 +191,7 @@ public class Controller {
     	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	List<String> instList = new ArrayList<String>();
-    	//This block of for loop generates a list of all instructors that shows up in the search
+    	//This block of for loop generates a list of all distinct instructors that shows up in the search
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -271,23 +275,8 @@ public class Controller {
     		}
     	}
     	
-    	//Add a random block on Saturday
-    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
-    	Label randomLabel = new Label("COMP1022\nL1");
-    	Random r = new Random();
-    	double start = (r.nextInt(10) + 1) * 20 + 40;
-
-    	randomLabel.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-    	randomLabel.setLayoutX(600.0);
-    	randomLabel.setLayoutY(start);
-    	randomLabel.setMinWidth(100.0);
-    	randomLabel.setMaxWidth(100.0);
-    	randomLabel.setMinHeight(60);
-    	randomLabel.setMaxHeight(60);
-    
-    	ap.getChildren().addAll(randomLabel);
     }
-    
+
     // Button "Select All" function
     @FXML
     
@@ -564,5 +553,6 @@ public class Controller {
         	}
         } 
         textAreaConsole.setText(feedback  + "\n" + textAreaConsole.getText());
+        Timetable.timetableUpdate(tabTimetable, cacheCourseList);
     }       
 }
