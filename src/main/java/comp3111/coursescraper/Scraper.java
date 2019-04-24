@@ -226,7 +226,7 @@ public class Scraper {
 	 */
 	public List<String> getSubjects(String baseurl, String term){
 		try {
-			HtmlPage page = client.getPage(baseurl + term + "/subject/ACCT"); // (baseurl + term + "/") should be used here but the site is down right now
+			HtmlPage page = client.getPage(baseurl + term + "/");
 			List<?> items = (List<?>) page.getByXPath("//div[@class='depts']/a");
 			Vector<String> result =  new Vector<String>();
 			for(int i=0; i<items.size();++i) {
@@ -234,7 +234,69 @@ public class Scraper {
 				String subj = htmlItem.asText();
 				result.add(subj);
 			}
+			client.close();
 			return result;		
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	/**
+	 * Still Working on, TBD
+	 * @param sfqurl from SFQ url text field
+	 * @param another param needed?(TBD)
+	 * @return type TBD
+	 */
+	public List<String> getSFQData(String sfqurl, List<Section> courseList, List<Course> Courses){
+		try {
+			HtmlPage page = client.getPage(sfqurl);
+			List<String> result = new Vector<String>();
+			
+			//List<?> Titles = (List<?>) page.getByXPath("//td[@colspan='3']");
+			List<?> items = (List<?>) page.getByXPath("//td");
+			
+			for(int i=0;i<items.size();++i) {
+				HtmlElement e = (HtmlElement) items.get(i);
+				String title = e.asText();
+				String titleCheck = title.replaceAll("\\s", "");
+				for(Section s: courseList) {
+					String enrollTitle = s.findCourseCode(Courses);
+					/*works fine above*/
+					if(titleCheck.equals(enrollTitle)) {
+						result.add(titleCheck);				
+						e = (HtmlElement) items.get(i+1);
+						result.add(e.asText().substring(0,10));
+					}
+				}
+			}
+			
+			
+			return result;
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	/**
+	 * Still Working on, TBD
+	 * @param sfqurl from SFQ url text field
+	 * @return type TBD
+	 */
+	public List<?> getInstructorSFQ(String sfqurl){
+		try {
+			HtmlPage page = client.getPage(sfqurl);
+			/*still working*/
+			List<?> temp = (List<?>) page.getByXPath("/html/body/table[@border=1]/tbody"); //get all table tag except first table
+			
+			//List<List<?>> temp2 = new Vector<List<?>>(); //create another list to store the list of data on each table
+			
+			for(int i=0; i<temp.size();++i) {
+				HtmlElement htmlelement = (HtmlElement)temp.get(i);
+				List<?> temp1 = (List<?>) htmlelement.getByXPath(".//tr");
+				//  /html/body/table[3]/tbody/tr[4]/td[3]
+			}
+			return temp;
+			/*still working*/
 		}catch(Exception e) {
 			System.out.println(e);
 		}
