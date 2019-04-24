@@ -522,8 +522,8 @@ public class Controller {
         		);
         tViewList.getColumns().set(4, tColumnEnroll);
              
-    	  // Feedback which courses you have enrolled
-    	  String feedback = "The following sections are enrolled:" + "\n";
+    	// Feedback which courses you have enrolled
+    	String feedback = "The following sections are enrolled:" + "\n";
         for (Course course : cacheCourseList) {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
