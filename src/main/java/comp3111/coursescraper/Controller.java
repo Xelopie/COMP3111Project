@@ -149,18 +149,34 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    //List<String> InstructorList = new ArrayList<String>();
+    
+    
+    
     // Cache list for searched course to prevent duplicate (Used to maintain the enroll)
     private List<Course> cacheCourseList = new Vector<Course>();
     // List we have after search
     private List<Course> searchedCourseList = new Vector<Course>();
     // List we have after filter
     private List<Course> filteredCourseList = new Vector<Course>();
+    //List to store enrolled course
+    private List<Section> enrolledCourseList = new Vector<Section>();
     
+    
+    /**
+     * Disable buttonSfqEnrollCourse at first(temp removed for other function testing)
+     */
+    
+    @FXML
+    public void initialize() {
+    	buttonSfqEnrollCourse.setDisable(true);
+    }
+
     /**
      * Print out all the info of a course
      * @param c from List of courses scrapped
      */
-    void ListDetail(Course c) {
+    void CourseDetail(Course c) {
     	String newline = c.getTitle() + "\n";
 		for (int i = 0; i < c.getNumSections(); i++){
     		Section sect = c.getSection(i);
@@ -177,9 +193,12 @@ public class Controller {
     
     @FXML
     void allSubjectSearch(){
-    	List<Course> AllCourseList = new Vector<Course>();
+    	searchedCourseList.clear();
+    	cacheCourseList.clear();
+    	buttonSfqEnrollCourse.setDisable(false);
+    		
     	List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
-    	if(Subjects == null) {textAreaConsole.setText("Something wrong with BASE URL or Term.");};
+    	if(Subjects == null) {textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");};
     	int AllSubjectCount = Subjects.size(); 
     	
     	DoWork = new Service<Integer>() {
@@ -192,17 +211,16 @@ public class Controller {
 					@Override
 					protected Integer call() throws Exception {
 						int sectionCount = 0;
-							for(int i=0;i<AllSubjectCount;++i) {//search and get all subjects' info
-					    		List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(), Subjects.get(i));
-					    		for(Course c: temp) {
-					    			if (c.isValidCourse()) {
-					        			sectionCount  += c.getNumValidSections();
-					        			AllCourseList.add(c);
-					        			}
-					    		}
-					    		updateProgress(i+1, AllSubjectCount);
-					    		System.out.println("SUBJECT is done:" + i);
-							}
+						for(int i=0;i<AllSubjectCount;++i) {//search and get all subjects' info
+							//temporary list for courses of a subject
+					    	List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(), Subjects.get(i));
+					    	for(Course c: temp) { //all course included
+					        		sectionCount  += c.getNumValidSections();
+					        		searchedCourseList.add(c);
+					    	}
+					    	updateProgress(i+1, AllSubjectCount);
+					    	System.out.println("SUBJECT is done:" + i);
+						}
 						return sectionCount;
 					}
 					
@@ -214,32 +232,63 @@ public class Controller {
 
 			@Override
 			public void handle(WorkerStateEvent event) {
+				cacheCourseList.addAll(searchedCourseList);
 				textAreaConsole.setText("Total Number of Categories:"+ AllSubjectCount +"\n");
-		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + AllCourseList.size() + "\nTotal Number of difference sections in this search: " + DoWork.getValue() + "\n");
+		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + searchedCourseList.size() + "\nTotal Number of difference sections in this search: " + DoWork.getValue() + "\n");
 
-		    	for (Course c : AllCourseList) {
-		    		ListDetail(c);
+		    	for (Course c : searchedCourseList) {
+		    		CourseDetail(c);
 		    	}			
 			} 	
     	});
-    	DoWork.restart();   	   		
+    	DoWork.restart();  
+    	
     }
-    
+
     @FXML
     void findInstructorSfq() {
-    	buttonInstructorSfq.setDisable(true);
-    	// Add line begin
-    	textAreaConsole.setText(textAreaConsole.getText() + "\n" + textfieldSfqUrl.getText());
-    	// Add line end
+    	/*
+    	for(Course c: AllCourseList) {
+    		for (int i = 0; i < c.getNumSections(); i++)
+    		{
+    			Section sect = c.getSection(i);
+    			for (int j = 0; j < sect.getNumInstructors(); j++)
+    			{
+    				if (!InstructorList.contains(sect.getInstructor(j).toString()))
+    					InstructorList.add(sect.getInstructor(j).toString());
+    			}
+    		}
+    	}
+    	
+    	/*to be changed*/
+    	List<?> temp = scraper.getInstructorSFQ(textfieldSfqUrl.getText());
+    	if(temp.isEmpty()) System.out.println("wrong"); //function check; to be removed later
+    	else System.out.println(temp.size());
+    	
+    	return;
     }
 
     @FXML
     void findSfqEnrollCourse() {
-
+    	if(enrolledCourseList.isEmpty()) {
+    		textAreaConsole.setText("No course enrolled.");
+    		return;
+    	}
+    	textAreaConsole.clear();
+    	List<?> data = scraper.getSFQData(textfieldSfqUrl.getText(), enrolledCourseList, cacheCourseList);
+    		
+    	String output = "The Enrolled Course Overall Mean(SD) is:\n";
+    	for(int i=0;i<data.size();i+=2) {
+    		output += (data.get(i)+": "+data.get(i+1)+"\n");
+    	}
+    	textAreaConsole.setText(output);
+    	return;
     }
     
     @FXML
     void search() {
+    	buttonSfqEnrollCourse.setDisable(false);
+    	
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	//The request URL is assembled by the 3 textfield inputs. If v == null, theoretically UnknownHostException is the only possible outcome
     	if (v == null)
@@ -304,7 +353,7 @@ public class Controller {
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);
     	    	
     	for (Course c : v) {
-    		ListDetail(c);
+    		CourseDetail(c);
     	}
     	
     	/* For-loop added for Task 3 */
@@ -618,7 +667,11 @@ public class Controller {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
         		if (section.getEnroll().isSelected()) {
+        			if(!enrolledCourseList.contains(section)) enrolledCourseList.add(section);
         			feedback += section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n";
+        		}
+        		else {
+        			if(enrolledCourseList.contains(section)) enrolledCourseList.remove(section);
         		}
         	}
         } 
