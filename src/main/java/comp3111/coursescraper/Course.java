@@ -144,7 +144,7 @@ public class Course {
 	}
 	
 	/**
-	 * Determine if the course satisfies the filter condition (No exclusion)
+	 * Determine if the course satisfies the filter condition (No Exclusion)
 	 * @return true if the course has no exclusion
 	 */
 	public boolean isNoEx() {
@@ -156,7 +156,7 @@ public class Course {
 	
 	/**
 	 * Determine if the course satisfies the filter condition (AM/PM)
-	 * @return true if the course contains both AM & PM slots
+	 * @return true if the course contains both AM and PM slots
 	 * @return true if the course contains a slot starting at AM and ending at PM
 	 */
 	public boolean containsAMPMSection() {
@@ -192,8 +192,8 @@ public class Course {
 	}
 	
 	/**
-	 * Determine if the course satisfies the filter condition (Day)
-	 * @return boolean array of size 6, referring Mon to Sat 
+	 * Determine if the course satisfies the filter condition (Mon to Sat)
+	 * @return true on boolean[0] if the course contains a Monday slot, true on boolean[1] if the course contains a Tuesday slot, and so on  
 	 */
 	public boolean[] containsDaySection() {
 		boolean[] bContainsDaySection = new boolean[6];

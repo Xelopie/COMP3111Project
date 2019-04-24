@@ -81,6 +81,11 @@ public class Section {
 		slots[numSlots++] = s.clone();
 	}
 	
+	/**
+	 * Get the target slot
+	 * @param i the index of the slot in the slot list
+	 * @return slots[i]
+	 */
 	public Slot getSlot(int i) {
 		if (i >= 0 && i < numSlots)
 			return slots[i];
@@ -98,6 +103,11 @@ public class Section {
 		instructors[numInstructors++] = inst.clone();
 	}
 	
+	/**
+	 * Get the target instructor
+	 * @param i the index of the instructor in the instructor list
+	 * @return instructors[i]
+	 */
 	public Instructor getInstructor(int i)
 	{
 		if (i >= 0 && i < numInstructors)
@@ -269,7 +279,7 @@ public class Section {
 	/**
 	 * This shouldn't be called directly in Controller.
 	 * This should be called in its associated Course. 
-	 * @return boolean array of size 6
+	 * @return true if the section contains a Monday slot, true if the section contains a Tuesday slot, and so on
 	 */
 	public boolean[] containsDaySlot() {
 		boolean[] bContainDaySlot = new boolean[6];
@@ -306,7 +316,7 @@ public class Section {
 	 * Find the course name of this section in a given course list.
 	 * Use with caution! Should input a valid course list as parameter.
 	 * @param courseList
-	 * @return Valid course name (e.g Object-Oriented Programming) if section found in list
+	 * @return Valid course name (e.g Object Oriented Programming) if section found in list
 	 */
 	public String findCourseName(List<Course> courseList) {
 		for (Course course : courseList) {
