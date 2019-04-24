@@ -1,44 +1,21 @@
 package comp3111.coursescraper;
 
-
-import java.awt.event.ActionEvent;
-import java.time.Duration;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.util.Callback;
 
-import java.util.Random;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class Controller {
 	
@@ -171,6 +148,9 @@ public class Controller {
 
     }
     
+    /**
+     * Event to handle the "Search" button
+     */
     @FXML
     void search() {
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
@@ -277,9 +257,10 @@ public class Controller {
     	
     }
 
-    // Button "Select All" function
-    @FXML
-    
+    /**
+     * Event to handle the "Select All" button
+     */
+    @FXML    
     void selectAll() {
     	if (buttonSelectAll.getText().equals("Select All")) 
     	{
@@ -320,7 +301,9 @@ public class Controller {
     	}
     }
 
-    // Event used to update the info displayed in console in filter tab 
+    /**
+     * Event to handle the filter
+     */
     @FXML
     void filter() {
     	// Clear the console first
@@ -348,9 +331,6 @@ public class Controller {
     		// Display all courses normally
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
         	for (Course course : searchedCourseList) {
-        		// newline for debug (disable the real newline when using)
-//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
-        		
         		// newline for real
         		String newline = course.getTitle() + "\n";
         		
@@ -372,10 +352,7 @@ public class Controller {
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
         	for (Course course : searchedCourseList) {
-        		// newline for debug (disable the real newline when using)
-//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
-        		
-        		// newline for real
+        		// newline init
         		String newline = course.getTitle() + "\n";
         		
         		/* Bools for filter */
@@ -469,7 +446,9 @@ public class Controller {
 
     }
         
-    // Event handling the list (Task 3)
+    /**
+     * Event to handle the list & enroll
+     */
     @FXML
     void list() {
     	// Run the filter once to show filtered info

@@ -132,6 +132,10 @@ public class Course {
 
 	/* Helper functions for filter (Task 2) */
 	
+	/**
+	 * Determine if the course satisfies the filter condition (Common Core)
+	 * @return true if the course is a common core
+	 */
 	public boolean isCC4Y() {
 		if (attribute.contains("Common Core") && attribute.contains("4Y")) {
 			return true;
@@ -139,6 +143,10 @@ public class Course {
 		return false;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (No Exclusion)
+	 * @return true if the course has no exclusion
+	 */
 	public boolean isNoEx() {
 		if (exclusion.contains("null")) {
 			return true;
@@ -146,6 +154,11 @@ public class Course {
 		return false;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (AM/PM)
+	 * @return true if the course contains both AM and PM slots
+	 * @return true if the course contains a slot starting at AM and ending at PM
+	 */
 	public boolean containsAMPMSection() {
 		for (int i = 0; i < numSections; i++) {
 			if (sections[i].containsAMPMSlot())
@@ -154,6 +167,10 @@ public class Course {
 		return false;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (AM)
+	 * @return true if the course contains a AM slot
+	 */
 	public boolean containsAMSection() {
 		for (int i = 0; i < numSections; i++) {
 			if (sections[i].containsAMSlot())
@@ -162,6 +179,10 @@ public class Course {
 		return false;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (PM)
+	 * @return true if the course contains a PM slot
+	 */
 	public boolean containsPMSection() {
 		for (int i = 0; i < numSections; i++) {
 			if (sections[i].containsPMSlot())
@@ -170,6 +191,10 @@ public class Course {
 		return false;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (Mon to Sat)
+	 * @return true on boolean[0] if the course contains a Monday slot, true on boolean[1] if the course contains a Tuesday slot, and so on  
+	 */
 	public boolean[] containsDaySection() {
 		boolean[] bContainsDaySection = new boolean[6];
 		for (int i = 0; i < numSections; i++) {
@@ -180,6 +205,10 @@ public class Course {
 		return bContainsDaySection;
 	}
 	
+	/**
+	 * Determine if the course satisfies the filter condition (Contains Lab or Tutorial)
+	 * @return true if the course contains Lab or tutorial
+	 */
 	public boolean containsLabOrTut() {
 		for (int i = 0; i < numSections; i++) {
 			if (sections[i].getCode().contains("LA") || sections[i].getCode().contains("T"))
