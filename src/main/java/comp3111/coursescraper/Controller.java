@@ -160,7 +160,7 @@ public class Controller {
     		textAreaConsole.setText("Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
     		return;
     	}
-    	//This for loop block generates the total number of courses and sections
+    	//This for loop generates the total number of courses and sections
     	int courseCount = 0, sectionCount = 0;
     	for (Course c : v)
     	{
@@ -171,7 +171,8 @@ public class Controller {
     	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	List<String> instList = new ArrayList<String>();
-    	//This block of for loop generates a list of all distinct instructors that shows up in the search
+
+    	//This for loop generates a list of all instructors that shows up in the search
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -184,7 +185,7 @@ public class Controller {
     			}
     		}
     	}
-    	//This block of for loop eliminates the instructors that are busy at the time specified by queryDay and queryTime from the list
+    	//This for loop eliminates the instructors that are busy at the time specified by queryDay and queryTime from the list
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -199,7 +200,7 @@ public class Controller {
 				}
     		}
     	}
-    	Collections.sort(instList);	//Sort the instList, by default it is sorted with the natural ordering (in ascending order, alphabetically)
+    	Collections.sort(instList);	//Sort the instList, by default it is sorted with the natural ordering (in ascending order of string, alphabetically)
     	String queryStr = "Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: \n"; 
     	if (instList.size() == 0)
     		queryStr += "None.\n";
@@ -211,7 +212,7 @@ public class Controller {
     			queryStr += (i % rowFactor != 0? " | ": "");	//If it is not the first name in a row, add the separator " | "
     			queryStr += instList.get(i);
     			//If it is the last name in a row, or it is the last name in the list, add "\n"
-    			queryStr += ((i % rowFactor == rowFactor - 1) || (i == instList.size()-1)? "\n": "");
+    			queryStr += ((i % rowFactor == rowFactor - 1) || (i == instList.size() - 1)? "\n": "");
     		}
     	}
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);

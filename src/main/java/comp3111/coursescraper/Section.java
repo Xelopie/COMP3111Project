@@ -197,8 +197,8 @@ public class Section {
 	}
 	
 	/**
-	 * Returns a boolean value depending on whether the section is valid. A valid section contains "L", "LA", or "T" in the code.
-	 * @return boolean - is the section valid
+	 * Returns true if the section is valid. A valid section contains "L", "LA", or "T" in the code.
+	 * @return true this is a valid section
 	 */
 	public boolean isValidSection()
 	{
@@ -209,10 +209,10 @@ public class Section {
 	}
 	
 	/**
-	 * Returns a boolean value depending on whether there are slots that covers the time parameters. Defined as start time is earlier or equal to the time, AND end time is equal to or after the time. 
+	 * Returns true if there is any slot that covers the time parameters. Defined as start time of a slot is earlier or equal to the parameter, AND end time of a slot is equal to or after the parameter. 
 	 * @param day the day being asked
 	 * @param time the time being asked
-	 * @return boolean - is the section busy at the time specified by the parameters
+	 * @return true if the section is busy
 	 */
 	public boolean isBusyAt(int day, String time)
 	{

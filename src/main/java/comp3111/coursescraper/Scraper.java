@@ -108,21 +108,8 @@ public class Scraper {
 	
 	private void addSlot(HtmlElement e, Section sect, boolean nonFirstRow)	//Boolean parameter originally named secondRow, changed to suit better for max number of slots being 3
 	{
-		String times[], venue;
-		char probe = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().charAt(0);	//Take the first character of the time slot string
-		//Check for exceptional case where the slots have date specified before slot, then the first 2 char will be integer[0..9]
-		if ((int)probe >= 48 && (int)probe <= 57)
-		{
-			//Date and time are separated by <br> in html, which becomes "\n" by asText()
-			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split("\n");
-			//After split("\n"), times[0] is the date, times[1] is the time we want to split again
-			times = times[1].split(" ");
-		}
-		else
-		{
-			times = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
-		}
-		venue = e.getChildNodes().get(nonFirstRow ? 1 : 4).asText();
+		String times[] = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
+		String venue = e.getChildNodes().get(nonFirstRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -193,8 +180,7 @@ public class Scraper {
 					{
 						addSlot(htmlElem, c.getSection(j), true);
 						htmlElem = (HtmlElement)htmlElem.getNextSibling();
-						//If the section has a third slot. At this point the chance is that the section has more than 3 slots.
-						//However, slot is defined to have a max size of 3
+						//Slot is defined to have a max size of 3
 						if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
 						{
 							addSlot(htmlElem, c.getSection(j), true);
@@ -207,7 +193,7 @@ public class Scraper {
 			client.close();
 			return result;
 		} catch (Exception e) {
-			//This should be the only error throwing operation that would appear on the system console
+			//The only exception should be 404 page
 			//System.out.println(e);
 		}
 		return null;
