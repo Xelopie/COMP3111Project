@@ -139,23 +139,18 @@ public class FxTest extends ApplicationTest {
 	
 		/* Test the filter */
 		clickOn("#cboxAM");
-		clickOn("#cboxAM");
-		
+		clickOn("#cboxAM");		
 		clickOn("#cboxPM");
 		clickOn("#cboxPM");
 		
 		clickOn("#cboxMon");
-		clickOn("#cboxMon");
-		
+		clickOn("#cboxMon");		
 		clickOn("#cboxTue");
-		clickOn("#cboxTue");
-		
+		clickOn("#cboxTue");		
 		clickOn("#cboxWed");
-		clickOn("#cboxWed");
-		
+		clickOn("#cboxWed");		
 		clickOn("#cboxThur");
-		clickOn("#cboxThur");
-		
+		clickOn("#cboxThur");		
 		clickOn("#cboxFri");
 		clickOn("#cboxFri");
 		
@@ -163,8 +158,14 @@ public class FxTest extends ApplicationTest {
 		assertTrue(console.getText().contains("COMP 3071"));
 		clickOn("#cboxSat");
 		
-		clickOn("#cboxWed");
-		clickOn("#cboxWed");
+		clickOn("#cboxCC");
+		clickOn("#cboxCC");
+		
+		clickOn("#cboxNoEx");
+		clickOn("#cboxNoEx");
+		
+		clickOn("#cboxLabOrTut");
+		clickOn("#cboxLabOrTut");
 		
 		clickOn("#cboxMon");
 		clickOn("#cboxFri");
