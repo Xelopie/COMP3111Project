@@ -220,7 +220,11 @@ public class Section {
 	
 	
 	/* Helper functions for filter (Task 2) */
-	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a AM slot
+	 */
 	public boolean containsAMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON)) {
@@ -230,6 +234,11 @@ public class Section {
 		return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a PM slot
+	 */
 	public boolean containsPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON)) {
@@ -239,6 +248,11 @@ public class Section {
 		return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a AM/PM slot
+	 */
 	public boolean containsAMPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
@@ -252,6 +266,11 @@ public class Section {
 		else return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return boolean array of size 6
+	 */
 	public boolean[] containsDaySlot() {
 		boolean[] bContainDaySlot = new boolean[6];
 		for (int i = 0; i < numSlots; i++) {
@@ -265,6 +284,12 @@ public class Section {
 	}
 	
 	/* Helper functions for Task 3 */
+	/**
+	 * Find the course code of this section in a given course list.
+     * Use with caution! Should input a valid course list as parameter.
+	 * @param courseList
+	 * @return Valid course code (e.g. COMP2011) if section found in list
+	 */
 	public String findCourseCode(List<Course> courseList) {
 		for (Course course : courseList) {
 			for (int i = 0; i < course.getNumSections(); i++) {
@@ -277,6 +302,12 @@ public class Section {
 		return null;
 	}
 	
+	/**
+	 * Find the course name of this section in a given course list.
+	 * Use with caution! Should input a valid course list as parameter.
+	 * @param courseList
+	 * @return Valid course name (e.g Object-Oriented Programming) if section found in list
+	 */
 	public String findCourseName(List<Course> courseList) {
 		for (Course course : courseList) {
 			for (int i = 0; i < course.getNumSections(); i++) {
