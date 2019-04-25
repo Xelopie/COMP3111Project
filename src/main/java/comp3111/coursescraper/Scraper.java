@@ -251,6 +251,7 @@ public class Scraper {
 	public List<String> getSFQData(String sfqurl, List<Section> sectionList, List<Course> Courses){
 		try {
 			HtmlPage page = client.getPage(sfqurl);
+			
 			List<String> result = new Vector<String>();
 			
 			List<?> items = (List<?>) page.getByXPath("//td");
@@ -264,7 +265,8 @@ public class Scraper {
 							if(!result.contains(title)) {
 								result.add(title);
 								HtmlElement temp = (HtmlElement) items.get(i+1);
-								result.add(temp.asText().substring(0,10)); 
+								int index = temp.asText().indexOf("(");
+								result.add(temp.asText().substring(0,index)); 
 						}
 					}
 				}
@@ -275,30 +277,61 @@ public class Scraper {
 		}
 		return null;
 	}
+
 	/**
-	 * Still Working on, TBD
-	 * @param sfqurl from SFQ url text field
-	 * @return type TBD
+	 * Get data under Instructor Overall Mean for each instructor and calculate the mean if >1 sections are taught
+	 * @param sfqurl
+	 * @param nameList
+	 * @return A list storing the SFQ including the instructor's name and his/her average score
 	 */
-	public List<String> getInstructorSFQ(String sfqurl){
+	public List<SFQ> getInstructorSFQ(String sfqurl){
 		try {
 			HtmlPage page = client.getPage(sfqurl);
-			/*still working*/
-			List<?> items = (List<?>) page.getByXPath("//td[not(@align='center')][3]"); 
-			List<String> result = new Vector<String>();
+			List<SFQ> result = new Vector<SFQ>();
+			/*Get the name of Instructors first*/
+			List<String> nameList = new Vector<String>();
+						
+			List<?> temp = (List<?>) page.getByXPath("//td[not(@align='center')][3]"); 
 			
-			//List<List<?>> temp2 = new Vector<List<?>>(); //create another list to store the list of data on each table
-			
-			for(int i=0; i<items.size();++i) {
-				HtmlElement e = (HtmlElement)items.get(i);
+			for(int i=0; i<temp.size();++i) {
+				HtmlElement e = (HtmlElement)temp.get(i);
 				String name = e.asText();
-				result.add(name); //potential problem: empty cells are added into the list
+				if(!name.equals(" ") && !name.equals("  ")) {
+					if(!nameList.contains(name))
+						nameList.add(name); //empty cells won't be added
+				}
+			}
+			/*Find the score by name*/
+			List<?> items = (List<?>) page.getByXPath("//td");
+			for(String s: nameList) {
+				double sum = 0; int count = 0;
+				for(int i=0;i<items.size();++i) {
+					HtmlElement e = (HtmlElement)items.get(i);
+					if(e.asText().equals(s)) {
+						e = (HtmlElement)items.get(i+2);
+						String data = e.asText();
+						int index = data.indexOf("(");				
+						data = e.asText().substring(0, index);
+						if(!data.equals("-")) {
+							sum += Float.parseFloat(data);
+							count++;
+						}
+					}
+				}
+				if(count !=0) { //if at least one data found, add a new SFQ
+					SFQ sfq = new SFQ();
+					sum /= count;
+					sum = Math.round(sum * 10) / 10.0; 
+					sfq.setInstructor(s);
+					sfq.setScore(sum);
+					result.add(sfq);
+				}				
 			}
 			return result;
-			/*still working*/
 		}catch(Exception e) {
 			System.out.println(e);
 		}
 		return null;
 	}
+	
 }
