@@ -160,7 +160,7 @@ public class Controller {
     // List we have after filter
     private List<Course> filteredCourseList = new Vector<Course>();
     //List to store enrolled course
-    private List<Section> enrolledCourseList = new Vector<Section>();
+    private List<Section> enrolledSectionList = new Vector<Section>();
     
     
     /**
@@ -246,38 +246,35 @@ public class Controller {
     }
 
     @FXML
-    void findInstructorSfq() {
-    	/*
-    	for(Course c: AllCourseList) {
-    		for (int i = 0; i < c.getNumSections(); i++)
-    		{
-    			Section sect = c.getSection(i);
-    			for (int j = 0; j < sect.getNumInstructors(); j++)
-    			{
-    				if (!InstructorList.contains(sect.getInstructor(j).toString()))
-    					InstructorList.add(sect.getInstructor(j).toString());
-    			}
-    		}
+    void findInstructorSfq() {    	
+    	List<SFQ> temp = scraper.getInstructorSFQ(textfieldSfqUrl.getText());
+    	if(temp.isEmpty()) {
+    		System.out.println("Something goes wrong.");
+    		return;
     	}
-    	
-    	/*to be changed*/
-    	List<?> temp = scraper.getInstructorSFQ(textfieldSfqUrl.getText());
-    	if(temp.isEmpty()) System.out.println("wrong"); //function check; to be removed later
-    	else System.out.println(temp.size());
-    	
+    	String output = "Instructors' average SFQ:\n";
+    	for(int i=0;i<temp.size();++i) {
+    		SFQ sfq = temp.get(i);
+    		output +=(sfq.getInstructor()+": "+sfq.getScore()+"\n\n");
+    	}
+    	textAreaConsole.setText(output);
     	return;
     }
 
     @FXML
-    void findSfqEnrollCourse() {
-    	if(enrolledCourseList.isEmpty()) {
+    void findSfqEnrollCourse() { //rework needed
+    	if(enrolledSectionList.isEmpty()) {
     		textAreaConsole.setText("No course enrolled.");
     		return;
     	}
     	textAreaConsole.clear();
-    	List<?> data = scraper.getSFQData(textfieldSfqUrl.getText(), enrolledCourseList, cacheCourseList);
+    	List<?> data = scraper.getSFQData(textfieldSfqUrl.getText(), enrolledSectionList, cacheCourseList);
     		
-    	String output = "The Enrolled Course Overall Mean(SD) is:\n";
+    	String output = "The Enrolled Course Overall Mean is(if available):\n";
+    	if(data.isEmpty()) {
+    		textAreaConsole.setText(output+"No data available.\n");
+    		return;
+    	}
     	for(int i=0;i<data.size();i+=2) {
     		output += (data.get(i)+": "+data.get(i+1)+"\n");
     	}
@@ -667,11 +664,11 @@ public class Controller {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
         		if (section.getEnroll().isSelected()) {
-        			if(!enrolledCourseList.contains(section)) enrolledCourseList.add(section);
+        			if(!enrolledSectionList.contains(section)) enrolledSectionList.add(section);
         			feedback += section.findCourseCode(cacheCourseList) + " " + section.getCode() + "\n";
         		}
         		else {
-        			if(enrolledCourseList.contains(section)) enrolledCourseList.remove(section);
+        			if(enrolledSectionList.contains(section)) enrolledSectionList.remove(section);
         		}
         	}
         } 
