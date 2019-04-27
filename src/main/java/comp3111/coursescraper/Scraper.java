@@ -224,7 +224,7 @@ public class Scraper {
 	/**
 	 * Get all SFQ data for courses available on the website
 	 * @param sfqurl from SFQ url text field
-	 * @return Returns a list of SFQ including course title and average score
+	 * @return Returns a list of SFQ including course title and its average score
 	 */
 	public List<SFQ> getSFQData(String sfqurl){
 		try {
@@ -243,7 +243,7 @@ public class Scraper {
 						&& !titleCheck.equals("Course Group Overall")) {
 					titleList.add(title);		
 					SFQ sfq = new SFQ();
-					sfq.setTitle(title);
+					sfq.setName(title);
 					result.add(sfq);
 				}
 			}
@@ -343,7 +343,7 @@ public class Scraper {
 					SFQ sfq = new SFQ();
 					sum /= count;
 					//sum = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
-					sfq.setInstructor(s);
+					sfq.setName(s);
 					sfq.setScore(sum);
 					result.add(sfq);
 				}				
