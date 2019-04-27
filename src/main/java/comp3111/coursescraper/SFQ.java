@@ -1,26 +1,37 @@
 package comp3111.coursescraper;
-
+/**
+ * 
+ * Stores the Course title or instructors' name, and the score
+ *
+ */
 public class SFQ {
-	private String title;
-	private String instructor;
+	private String name;
 	private double score;
-	
-	public String getTitle() {
-		return title;
+	/**
+	 * Get the title of the course/ Instructor's name
+	 * @return a String storing the course title
+	 */
+	public String getName() {
+		return name;
 	}
-	public String getInstructor() {
-		return instructor;
-	}
+	/**
+	 * Get the score
+	 * @return score in double
+	 */
 	public double getScore() {
 		return score;
 	}
-	
-	public void setTitle(String title) {
-		this.title = title;
+	/**
+	 * Set the course title/ Instuctor's name
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
-	public void setInstructor(String instructor) {
-		this.instructor = instructor;
-	}
+	/**
+	 * Set the score
+	 * @param score
+	 */
 	public void setScore(double score) {
 		this.score = score;
 	}
