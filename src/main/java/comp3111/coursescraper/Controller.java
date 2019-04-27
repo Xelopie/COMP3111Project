@@ -162,6 +162,8 @@ public class Controller {
     //List to store enrolled course
     private List<Section> enrolledSectionList = new Vector<Section>();
     
+    private List<String> enrolledCourseTitles = new Vector<String>();
+    
     
     /**
      * Disable buttonSfqEnrollCourse at first(temp removed for other function testing)
@@ -234,7 +236,9 @@ public class Controller {
 			public void handle(WorkerStateEvent event) {
 				cacheCourseList.addAll(searchedCourseList);
 				textAreaConsole.setText("Total Number of Categories:"+ AllSubjectCount +"\n");
-		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + searchedCourseList.size() + "\nTotal Number of difference sections in this search: " + DoWork.getValue() + "\n");
+		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + 
+		    								searchedCourseList.size() + "\nTotal Number of difference sections in this search: " 
+		    								+ DoWork.getValue() + "\n");
 
 		    	for (Course c : searchedCourseList) {
 		    		CourseDetail(c);
@@ -262,21 +266,35 @@ public class Controller {
     }
 
     @FXML
-    void findSfqEnrollCourse() { //rework needed
+    void findSfqEnrollCourse() {
     	if(enrolledSectionList.isEmpty()) {
     		textAreaConsole.setText("No course enrolled.");
     		return;
     	}
+    	enrolledCourseTitles.clear();
     	textAreaConsole.clear();
-    	List<?> data = scraper.getSFQData(textfieldSfqUrl.getText(), enrolledSectionList, cacheCourseList);
-    		
+    	for(Section s: enrolledSectionList) {
+    		String name = s.findCourseCode(cacheCourseList);
+    		if(!enrolledCourseTitles.contains(name)) enrolledCourseTitles.add(name);
+    	}
+    	List<SFQ> data = scraper.getSFQData(textfieldSfqUrl.getText());
+    	
     	String output = "The Enrolled Course Overall Mean is(if available):\n";
-    	if(data.isEmpty()) {
+ 
+    	if(data.isEmpty() || data == null) {
     		textAreaConsole.setText(output+"No data available.\n");
     		return;
     	}
-    	for(int i=0;i<data.size();i+=2) {
-    		output += (data.get(i)+": "+data.get(i+1)+"\n");
+    	for(int i=0;i<data.size();++i) {
+        	SFQ sfq = data.get(i);
+        	for(String title : enrolledCourseTitles) {
+        		if(sfq.getTitle().replaceAll("\\s","").equals(title)) {
+        			if(Double.isNaN(sfq.getScore())) {
+        				output += (sfq.getTitle()+": No data available.\n");
+        			}
+        			else output += (sfq.getTitle()+": "+sfq.getScore()+"\n");
+        		}
+        	}
     	}
     	textAreaConsole.setText(output);
     	return;

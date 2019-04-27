@@ -10,6 +10,7 @@ import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.javascript.host.dom.Text;
 import com.gargoylesoftware.htmlunit.html.DomText;
 import java.util.Vector;
 
@@ -242,46 +243,86 @@ public class Scraper {
 		return null;
 	}
 	/**
-	 * Return a list storing the enrolled course code and its unadjusted data
+	 * Get all SFQ data for courses available on the website
 	 * @param sfqurl from SFQ url text field
-	 * @param sectionList from a List storing the enrolled sections
-	 * @param Courses from a list storing the searched courses
-	 * @return Returns a list of String
+	 * @return Returns a list of SFQ including course title and average score
 	 */
-	public List<String> getSFQData(String sfqurl, List<Section> sectionList, List<Course> Courses){
+	public List<SFQ> getSFQData(String sfqurl){
 		try {
 			HtmlPage page = client.getPage(sfqurl);
+			List<SFQ> result = new Vector<SFQ>();
 			
-			List<String> result = new Vector<String>();
+			/*Get all course title and create SFQ*/
+			List<String> titleList = new Vector<String>();
+			List<?> temp = (List<?>) page.getByXPath("//td[@colspan=3]");
 			
-			List<?> items = (List<?>) page.getByXPath("//td");
+			for(int i=0;i<temp.size();++i) {
+				HtmlElement e = (HtmlElement) temp.get(i);
+				String title = e.asText();			
+				String titleCheck = title.trim();
+				if(!titleCheck.equals("Department Overall") 
+						&& !titleCheck.equals("Course Group Overall")) {
+					titleList.add(title);		
+					SFQ sfq = new SFQ();
+					sfq.setTitle(title);
+					result.add(sfq);
+				}
+			}
+			/*Get Score*/
+			int count = -1, counter=0; double score=0;
+			temp = (List<?>) page.getByXPath("//table[@border=1]");
+			int table_count = temp.size();
 			
-			for(int i=0;i<items.size();++i) {
-				HtmlElement e = (HtmlElement) items.get(i);
-				String title = e.asText().replaceAll("\\s", "");
-				for(Section s: sectionList) {
-					String enrollTitle = s.findCourseCode(Courses);
-						if(title.equals(enrollTitle)) {	
-							if(!result.contains(title)) {
-								result.add(title);
-								HtmlElement temp = (HtmlElement) items.get(i+1);
-								int index = temp.asText().indexOf("(");
-								result.add(temp.asText().substring(0,index)); 
+			for(int i=1;i<table_count+1;++i) {//for each table
+				temp = (List<?>) page.getByXPath("//table[@border=1]["+ i +"]//tr"); //get every row in the table
+				int row_count = temp.size()-1; //last row is not needed
+				for(int j=0;j<row_count;++j) { 
+					temp = (List<?>) page.getByXPath("//table[@border=1]["+i+"]//tr["+j+"]/td"); //get all td in each row
+					
+					if(!temp.isEmpty()) { //temp is empty for the first row for every table
+						HtmlElement x = (HtmlElement) temp.get(0); //get first td for checking
+						if(!x.asText().equals(" ")) { //first td not empty cell
+							for(String title: titleList) {
+								if(x.asText().equals(title)) {
+									if(count >-1) { 
+										score /= counter;
+										//score = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
+										result.get(count).setScore(score); //set SFQ score
+									}
+									count++; //move to next course
+									score = 0; counter = 0; //reset score and no. of section
+								}
+							}
+						}
+						else {
+							x = (HtmlElement) temp.get(1); //check second td
+							if(!x.asText().equals(" ")) { //if contains section code
+								x = (HtmlElement) temp.get(3);
+								String data = x.asText();
+								int index = data.indexOf("(");				
+								data = data.substring(0, index);
+								if(!data.equals("-")) { //if number is available
+									score += Double.parseDouble(data);
+									counter++;
+								}
+							}
 						}
 					}
 				}
 			}
+			/*set score for the last course of last table*/
+			score /= counter;
+			//score = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
+			result.get(count).setScore(score);
 			return result;
 		}catch(Exception e) {
 			System.out.println(e);
 		}
 		return null;
 	}
-
 	/**
 	 * Get data under Instructor Overall Mean for each instructor and calculate the mean if >1 sections are taught
-	 * @param sfqurl
-	 * @param nameList
+	 * @param sfqurl from SFQ url text field
 	 * @return A list storing the SFQ including the instructor's name and his/her average score
 	 */
 	public List<SFQ> getInstructorSFQ(String sfqurl){
@@ -296,24 +337,25 @@ public class Scraper {
 			for(int i=0; i<temp.size();++i) {
 				HtmlElement e = (HtmlElement)temp.get(i);
 				String name = e.asText();
-				if(!name.equals(" ") && !name.equals("  ")) {
+				if(!name.equals(" ") && name.charAt(1) !=' ') {
 					if(!nameList.contains(name))
 						nameList.add(name); //empty cells won't be added
 				}
 			}
 			/*Find the score by name*/
-			List<?> items = (List<?>) page.getByXPath("//td");
+			temp= (List<?>) page.getByXPath("//td");
+			
 			for(String s: nameList) {
 				double sum = 0; int count = 0;
-				for(int i=0;i<items.size();++i) {
-					HtmlElement e = (HtmlElement)items.get(i);
+				for(int i=0;i<temp.size();++i) {
+					HtmlElement e = (HtmlElement)temp.get(i);
 					if(e.asText().equals(s)) {
-						e = (HtmlElement)items.get(i+2);
+						e = (HtmlElement) temp.get(i+2);
 						String data = e.asText();
 						int index = data.indexOf("(");				
-						data = e.asText().substring(0, index);
+						data = data.substring(0, index);
 						if(!data.equals("-")) {
-							sum += Float.parseFloat(data);
+							sum += Double.parseDouble(data);
 							count++;
 						}
 					}
@@ -321,7 +363,7 @@ public class Scraper {
 				if(count !=0) { //if at least one data found, add a new SFQ
 					SFQ sfq = new SFQ();
 					sum /= count;
-					sum = Math.round(sum * 10) / 10.0; 
+					//sum = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
 					sfq.setInstructor(s);
 					sfq.setScore(sum);
 					result.add(sfq);
