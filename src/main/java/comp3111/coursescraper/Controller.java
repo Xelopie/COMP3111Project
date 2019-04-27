@@ -18,8 +18,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.CheckBox;
 
 import java.util.Vector;
-
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -5,8 +5,11 @@ import java.util.List;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+<<<<<<< HEAD
 import com.gargoylesoftware.htmlunit.javascript.host.dom.Text;
 import com.gargoylesoftware.htmlunit.html.DomText;
+=======
+>>>>>>> refs/remotes/origin/master
 import java.util.Vector;
 
 
