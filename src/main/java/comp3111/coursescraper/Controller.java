@@ -1,10 +1,5 @@
 package comp3111.coursescraper;
 
-
-import java.awt.event.ActionEvent;
-import java.time.LocalTime;
-
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
@@ -13,27 +8,15 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.CheckBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.geometry.Insets;
-import javafx.scene.paint.Color;
-import javafx.util.Callback;
 
-import java.util.Random;
 import java.util.Vector;
 
 
@@ -42,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Controller {
-
+	
     @FXML
     private Tab tabMain;
 
@@ -162,13 +145,9 @@ public class Controller {
     //List to store enrolled course
     private List<Section> enrolledSectionList = new Vector<Section>();
     
+
     private List<String> enrolledCourseTitles = new Vector<String>();
-    
-    
-    /**
-     * Disable buttonSfqEnrollCourse at first(temp removed for other function testing)
-     */
-    
+
     @FXML
     public void initialize() {
     	buttonSfqEnrollCourse.setDisable(true);
@@ -300,6 +279,9 @@ public class Controller {
     	return;
     }
     
+    /**
+     * Event to handle the "Search" button
+     */
     @FXML
     void search() {
     	buttonSfqEnrollCourse.setDisable(false);
@@ -311,7 +293,7 @@ public class Controller {
     		textAreaConsole.setText("Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
     		return;
     	}
-    	//This for loop block generates the total number of courses and sections
+    	//This for loop generates the total number of courses and sections
     	int courseCount = 0, sectionCount = 0;
     	for (Course c : v)
     	{
@@ -322,7 +304,8 @@ public class Controller {
     	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	List<String> instList = new ArrayList<String>();
-    	//This block of for loop generates a list of all instructors that shows up in the search
+
+    	//This for loop generates a list of all instructors that shows up in the search
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -335,7 +318,7 @@ public class Controller {
     			}
     		}
     	}
-    	//This block of for loop eliminates the instructors that are busy at the time specified by queryDay and queryTime from the list
+    	//This for loop eliminates the instructors that are busy at the time specified by queryDay and queryTime from the list
     	for (Course c: v)
     	{
     		for (int i = 0; i < c.getNumSections(); i++)
@@ -350,7 +333,7 @@ public class Controller {
 				}
     		}
     	}
-    	Collections.sort(instList);	//Sort the instList, by default it is sorted with the natural ordering (in ascending order, alphabetically)
+    	Collections.sort(instList);	//Sort the instList, by default it is sorted with the natural ordering (in ascending order of string, alphabetically)
     	String queryStr = "Instructors who has teaching assignment this term but does not need to teach at Tu 3:10pm: \n"; 
     	if (instList.size() == 0)
     		queryStr += "None.\n";
@@ -362,7 +345,7 @@ public class Controller {
     			queryStr += (i % rowFactor != 0? " | ": "");	//If it is not the first name in a row, add the separator " | "
     			queryStr += instList.get(i);
     			//If it is the last name in a row, or it is the last name in the list, add "\n"
-    			queryStr += ((i % rowFactor == rowFactor - 1) || (i == instList.size()-1)? "\n": "");
+    			queryStr += ((i % rowFactor == rowFactor - 1) || (i == instList.size() - 1)? "\n": "");
     		}
     	}
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);
@@ -394,26 +377,12 @@ public class Controller {
     		}
     	}
     	
-    	//Add a random block on Saturday
-    	AnchorPane ap = (AnchorPane)tabTimetable.getContent();
-    	Label randomLabel = new Label("COMP1022\nL1");
-    	Random r = new Random();
-    	double start = (r.nextInt(10) + 1) * 20 + 40;
-
-    	randomLabel.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-    	randomLabel.setLayoutX(600.0);
-    	randomLabel.setLayoutY(start);
-    	randomLabel.setMinWidth(100.0);
-    	randomLabel.setMaxWidth(100.0);
-    	randomLabel.setMinHeight(60);
-    	randomLabel.setMaxHeight(60);
-    
-    	ap.getChildren().addAll(randomLabel);
     }
-    
-    // Button "Select All" function
-    @FXML
-    
+
+    /**
+     * Event to handle the "Select All" button
+     */
+    @FXML    
     void selectAll() {
     	if (buttonSelectAll.getText().equals("Select All")) 
     	{
@@ -454,7 +423,9 @@ public class Controller {
     	}
     }
 
-    // Event used to update the info displayed in console in filter tab 
+    /**
+     * Event to handle the filter
+     */
     @FXML
     void filter() {
     	// Clear the console first
@@ -482,9 +453,6 @@ public class Controller {
     		// Display all courses normally
     		String output = "Unfiltered Output: (No conditions have been chosen)\n";
         	for (Course course : searchedCourseList) {
-        		// newline for debug (disable the real newline when using)
-//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
-        		
         		// newline for real
         		String newline = course.getTitle() + "\n";
         		
@@ -506,10 +474,7 @@ public class Controller {
     	else {
     		String output = "Filtered Output: (Filter applied)\n";
         	for (Course course : searchedCourseList) {
-        		// newline for debug (disable the real newline when using)
-//        		String newline = course.getTitle() + "\nAttribute: (Debug) " + course.getAttribute() + "\nExclusion: (Debug) " + course.getExclusion() + "\n";        		
-        		
-        		// newline for real
+        		// newline init
         		String newline = course.getTitle() + "\n";
         		
         		/* Bools for filter */
@@ -603,7 +568,9 @@ public class Controller {
 
     }
         
-    // Event handling the list (Task 3)
+    /**
+     * Event to handle the list & enroll
+     */
     @FXML
     void list() {
     	// Run the filter once to show filtered info
@@ -676,8 +643,8 @@ public class Controller {
         		);
         tViewList.getColumns().set(4, tColumnEnroll);
              
-    	  // Feedback which courses you have enrolled
-    	  String feedback = "The following sections are enrolled:" + "\n";
+    	// Feedback which courses you have enrolled
+    	String feedback = "The following sections are enrolled:" + "\n";
         for (Course course : cacheCourseList) {
         	for (int i = 0; i < course.getNumSections(); i++) {
         		Section section = course.getSection(i);
@@ -691,5 +658,6 @@ public class Controller {
         	}
         } 
         textAreaConsole.setText(feedback  + "\n" + textAreaConsole.getText());
+        Timetable.timetableUpdate(tabTimetable, cacheCourseList);
     }       
 }

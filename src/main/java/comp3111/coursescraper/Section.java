@@ -6,8 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.CheckBox;
 
 
@@ -81,6 +79,11 @@ public class Section {
 		slots[numSlots++] = s.clone();
 	}
 	
+	/**
+	 * Get the target slot
+	 * @param i the index of the slot in the slot list
+	 * @return slots[i]
+	 */
 	public Slot getSlot(int i) {
 		if (i >= 0 && i < numSlots)
 			return slots[i];
@@ -98,6 +101,11 @@ public class Section {
 		instructors[numInstructors++] = inst.clone();
 	}
 	
+	/**
+	 * Get the target instructor
+	 * @param i the index of the instructor in the instructor list
+	 * @return instructors[i]
+	 */
 	public Instructor getInstructor(int i)
 	{
 		if (i >= 0 && i < numInstructors)
@@ -189,8 +197,8 @@ public class Section {
 	}
 	
 	/**
-	 * Returns a boolean value depending on whether the section is valid. A valid section contains "L", "LA", or "T" in the code.
-	 * @return boolean - is the section valid
+	 * Returns true if the section is valid. A valid section contains "L", "LA", or "T" in the code.
+	 * @return true this is a valid section
 	 */
 	public boolean isValidSection()
 	{
@@ -201,10 +209,10 @@ public class Section {
 	}
 	
 	/**
-	 * Returns a boolean value depending on whether there are slots that covers the time parameters. Defined as start time is earlier or equal to the time, AND end time is equal to or after the time. 
+	 * Returns true if there is any slot that covers the time parameters. Defined as start time of a slot is earlier or equal to the parameter, AND end time of a slot is equal to or after the parameter. 
 	 * @param day the day being asked
 	 * @param time the time being asked
-	 * @return boolean - is the section busy at the time specified by the parameters
+	 * @return true if the section is busy
 	 */
 	public boolean isBusyAt(int day, String time)
 	{
@@ -220,7 +228,11 @@ public class Section {
 	
 	
 	/* Helper functions for filter (Task 2) */
-	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a AM slot
+	 */
 	public boolean containsAMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON)) {
@@ -230,6 +242,11 @@ public class Section {
 		return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a PM slot
+	 */
 	public boolean containsPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON)) {
@@ -239,6 +256,11 @@ public class Section {
 		return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a AM/PM slot
+	 */
 	public boolean containsAMPMSlot() {
 		for (int i = 0; i < numSlots; i++) {
 			if (slots[i].getStart().isBefore(LocalTime.NOON) && (slots[i].getEnd().equals(LocalTime.NOON) || slots[i].getEnd().isAfter(LocalTime.NOON))) {
@@ -252,6 +274,11 @@ public class Section {
 		else return false;
 	}
 	
+	/**
+	 * This shouldn't be called directly in Controller.
+	 * This should be called in its associated Course. 
+	 * @return true if the section contains a Monday slot, true if the section contains a Tuesday slot, and so on
+	 */
 	public boolean[] containsDaySlot() {
 		boolean[] bContainDaySlot = new boolean[6];
 		for (int i = 0; i < numSlots; i++) {
@@ -265,6 +292,12 @@ public class Section {
 	}
 	
 	/* Helper functions for Task 3 */
+	/**
+	 * Find the course code of this section in a given course list.
+     * Use with caution! Should input a valid course list as parameter.
+	 * @param courseList
+	 * @return Valid course code (e.g. COMP2011) if section found in list
+	 */
 	public String findCourseCode(List<Course> courseList) {
 		for (Course course : courseList) {
 			for (int i = 0; i < course.getNumSections(); i++) {
@@ -277,6 +310,12 @@ public class Section {
 		return null;
 	}
 	
+	/**
+	 * Find the course name of this section in a given course list.
+	 * Use with caution! Should input a valid course list as parameter.
+	 * @param courseList
+	 * @return Valid course name (e.g Object Oriented Programming) if section found in list
+	 */
 	public String findCourseName(List<Course> courseList) {
 		for (Course course : courseList) {
 			for (int i = 0; i < course.getNumSections(); i++) {
