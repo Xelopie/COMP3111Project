@@ -132,10 +132,6 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
-    //List<String> InstructorList = new ArrayList<String>();
-    
-    
-    
     // Cache list for searched course to prevent duplicate (Used to maintain the enroll)
     private List<Course> cacheCourseList = new Vector<Course>();
     // List we have after search
@@ -144,8 +140,7 @@ public class Controller {
     private List<Course> filteredCourseList = new Vector<Course>();
     //List to store enrolled course
     private List<Section> enrolledSectionList = new Vector<Section>();
-    
-
+   
     private List<String> enrolledCourseTitles = new Vector<String>();
 
     @FXML
