@@ -102,11 +102,13 @@ public class FxTest extends ApplicationTest {
 	@Test
 	public void testSearch() 
 	{
+		
 		clickOn("#tabMain");
 		clickOn("#buttonSearch");
 		
 		/* Test the basic function */
 		TextArea console = (TextArea)s.lookup("#textAreaConsole");
+		assertTrue(console.getText().contains("Total Number of Categories:74"));
 		assertTrue(console.getText().contains("COMP 1001") && console.getText().contains("COMP 7990"));
 		assertTrue(console.getText().contains("Total Number of Course in this search: 51"));
 		assertTrue(console.getText().contains("Total Number of difference sections in this search: 188"));
@@ -224,8 +226,10 @@ public class FxTest extends ApplicationTest {
 	
 	@Test
 	public void testAllSubjectSearch() {
+		TextArea console = (TextArea)s.lookup("#textAreaConsole");
 		clickOn("#tabAllSubject");
 		clickOn("#buttonAllSubjectSearch");
+		assertTrue(console.getText().contains("Total Number of Categories:74"));
 	}
 	
 	@Test

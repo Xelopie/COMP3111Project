@@ -280,17 +280,15 @@ public class Controller {
     @FXML
     void search() {
     	buttonSfqEnrollCourse.setDisable(false);
-    	if(firstClick) {
-    		List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
-        	if(Subjects == null) {
-        		textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");
-        		return;
-        	}
-        	textAreaConsole.setText("Total Number of Categories:"+ Subjects.size());
-        	firstClick = false;
-        	return;
-    	}
+    	firstClick = false;
     	
+    	List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
+        if(Subjects == null) {
+        	textAreaConsole.setText("Page not found! Please check that the base URL, Term, and Subject are all correct.\n");
+        	return;
+        }
+        textAreaConsole.setText("Total Number of Categories:"+ Subjects.size()+ "\n");
+
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	//The request URL is assembled by the 3 textfield inputs. If v == null, theoretically UnknownHostException is the only possible outcome
     	if (v == null)
@@ -306,7 +304,7 @@ public class Controller {
     			courseCount++;
     		sectionCount += c.getNumValidSections();
     	}
-    	textAreaConsole.setText("Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
+    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + courseCount + "\nTotal Number of difference sections in this search: " + sectionCount +  "\n");
     	
     	List<String> instList = new ArrayList<String>();
 
