@@ -130,6 +130,8 @@ public class Controller {
     
     private Scraper scraper = new Scraper();
     
+    private boolean firstClick = true;
+    
     // Cache list for searched course to prevent duplicate (Used to maintain the enroll)
     private List<Course> cacheCourseList = new Vector<Course>();
     // List we have after search
@@ -150,9 +152,19 @@ public class Controller {
     void allSubjectSearch(){
     	searchedCourseList.clear();
     	buttonSfqEnrollCourse.setDisable(false);
+    	if(firstClick) {
+    		List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
+        	if(Subjects == null) {
+        		textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");
+        		return;
+        	}
+        	textAreaConsole.setText("Total Number of Categories:"+ Subjects.size());
+        	firstClick = false;
+        	return;
+    	}
     		
     	List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
-    	if(Subjects == null) {textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");};
+    	if(Subjects == null) {textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");}
     	int AllSubjectCount = Subjects.size(); 
     	
     	DoWork = new Service<Void>() {
@@ -268,6 +280,16 @@ public class Controller {
     @FXML
     void search() {
     	buttonSfqEnrollCourse.setDisable(false);
+    	if(firstClick) {
+    		List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
+        	if(Subjects == null) {
+        		textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");
+        		return;
+        	}
+        	textAreaConsole.setText("Total Number of Categories:"+ Subjects.size());
+        	firstClick = false;
+        	return;
+    	}
     	
     	List<Course> v = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(),textfieldSubject.getText());
     	//The request URL is assembled by the 3 textfield inputs. If v == null, theoretically UnknownHostException is the only possible outcome
