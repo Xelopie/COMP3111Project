@@ -52,6 +52,16 @@ public class ItemTest {
 		
 	}
 	
+	@Test
+	public void testSFQ() {
+		SFQ sfq = new SFQ();
+		
+		sfq.setName("Test Name");
+		assertEquals(sfq.getName(), "Test Name");
+		
+		sfq.setScore(0);
+		assertEquals(sfq.getScore(),0,0);
+	}
 	
 	
 }

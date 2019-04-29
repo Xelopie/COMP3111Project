@@ -7,10 +7,13 @@ package comp3111.coursescraper;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -95,7 +98,7 @@ public class FxTest extends ApplicationTest {
 		cbox = (CheckBox)s.lookup("#cboxLabOrTut");
 		assertTrue(cbox.isSelected() == false);
 	}
-
+	
 	@Test
 	public void testSearch() 
 	{
@@ -218,4 +221,72 @@ public class FxTest extends ApplicationTest {
 		}
 		clickOn("#tabTimetable");
 	}
+	
+	@Test
+	public void testAllSubjectSearch() {
+		clickOn("#tabAllSubject");
+		clickOn("#buttonAllSubjectSearch");
+	}
+	
+	@Test
+	public void testfindInstructorSfq() {
+		clickOn("#tabSfq");
+		clickOn("#buttonInstructorSfq");
+		TextArea console = (TextArea)s.lookup("#textAreaConsole");
+		TextField url = (TextField)s.lookup("#textfieldSfqUrl");
+		/*1. Test incorrect url*/
+		url.setText("https://www.google.com");
+		assertTrue(console.getText().contains("Something goes wrong. Please check the url."));
+		
+		/*2. Correct url (data of SENG)*/
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("sfq.html").getFile());
+		url.setText("file:///"+file.getAbsolutePath());
+		clickOn("#buttonInstructorSfq");
+		assertTrue(console.getText().contains("WANG, Yiwen : ") 
+					&& console.getText().contains("YUEN, Matthew :") 
+					&& console.getText().contains("Instructors' average SFQ:"));
+	}
+	
+	@Test
+	public void testfindSfqEnrollCourse() {
+		TextArea console = (TextArea)s.lookup("#textAreaConsole");
+		
+		clickOn("#tabMain");
+		clickOn("#buttonSearch");
+		
+		clickOn("#tabSfq");
+		TextField url = (TextField)s.lookup("#textfieldSfqUrl");
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("sfq.html").getFile());
+		url.setText("file:///"+file.getAbsolutePath());
+		/*1. When no course is enrolled*/
+		clickOn("#buttonSfqEnrollCourse");
+		assertTrue(console.getText().contains("No course enrolled."));
+		/*2. Data is available*/
+		clickOn("#tabList");
+		TableView<Section> table = (TableView<Section>) s.lookup("#tViewList");
+		
+		clickOn(table.getItems().get(0).getEnroll());
+		clickOn("#tabSfq");
+		clickOn("#buttonSfqEnrollCourse");
+		assertTrue(console.getText().contains("The Enrolled Course Overall Mean is(if available):\nCOMP1001:"));
+		/*3. No data available case*/
+		clickOn("#tabList");
+		clickOn(table.getItems().get(0).getEnroll()); //cancel enrollment from 2
+		clickOn("#tabMain");
+		TextField term = (TextField)s.lookup("#textfieldTerm");
+		TextField subject = (TextField)s.lookup("#textfieldSubject");
+		term.setText("1840");
+		subject.setText("ACCT"); //ACCT course data unavailable on SENG
+		clickOn("#buttonSearch");
+		
+		clickOn("#tabList");
+		clickOn(table.getItems().get(0).getEnroll());
+		
+		clickOn("#tabSfq");
+		clickOn("#buttonSfqEnrollCourse");
+		assertTrue(console.getText().contains("The Enrolled Course Overall Mean is(if available):\nACCT2010: No data available."));
+	}
 }
+
