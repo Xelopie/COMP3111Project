@@ -126,7 +126,7 @@ public class Controller {
     @FXML
     private TableColumn<Section, CheckBox> tColumnEnroll;
     
-    private Service<Integer> DoWork;
+    private Service<Void> DoWork;
     
     private Scraper scraper = new Scraper();
     
@@ -145,59 +145,48 @@ public class Controller {
     public void initialize() {
     	buttonSfqEnrollCourse.setDisable(true);
     }
-
-    /**
-     * Print out all the info of a course
-     * @param c from List of courses scrapped
-     */
-    void CourseDetail(Course c) {
-    	String newline = c.getTitle() + "\n";
-		for (int i = 0; i < c.getNumSections(); i++){
-    		Section sect = c.getSection(i);
-			for (int j = 0; j < sect.getNumSlots(); j++){
-    			Slot slot = sect.getSlot(j);
-    			newline += sect + " Slot " + j + " | " + slot + "\n";
-    			//Echo for checking instructors[]
-    			//newline += "Taught by: " + sect.getInstructorString() + "\n";
-    		}
-		}
-		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
-		return;
-    }
-    
+ 
     @FXML
     void allSubjectSearch(){
     	searchedCourseList.clear();
-    	cacheCourseList.clear();
     	buttonSfqEnrollCourse.setDisable(false);
     		
     	List<String> Subjects = scraper.getSubjects(textfieldURL.getText(), textfieldTerm.getText()); 
     	if(Subjects == null) {textAreaConsole.setText("Please check your inputs(BASE URL,Term) and Internet connection.");};
     	int AllSubjectCount = Subjects.size(); 
     	
-    	DoWork = new Service<Integer>() {
+    	DoWork = new Service<Void>() {
 
 			@Override
-			protected Task<Integer> createTask() {
+			protected Task<Void> createTask() {
 				
-				return new Task<Integer>() {
+				return new Task<Void>() {
 
 					@Override
-					protected Integer call() throws Exception {
-						int sectionCount = 0;
+					protected Void call() throws Exception {
 						for(int i=0;i<AllSubjectCount;++i) {//search and get all subjects' info
 							//temporary list for courses of a subject
 					    	List<Course> temp = scraper.scrape(textfieldURL.getText(), textfieldTerm.getText(), Subjects.get(i));
-					    	for(Course c: temp) { //all course included
-					        		sectionCount  += c.getNumValidSections();
-					        		searchedCourseList.add(c);
-					    	}
+					    	for(Course newCourse: temp) { //all course included
+					        	boolean bAddNewCourse = true;
+					        		
+					        	for (Course oldCourse : cacheCourseList) {
+					        		if (newCourse.getTitle().equals(oldCourse.getTitle())) {
+					        			bAddNewCourse = false;
+					        			searchedCourseList.add(oldCourse);
+					        			break;
+					        		}
+					        	}					  	
+					        	if (bAddNewCourse) {
+					        		searchedCourseList.add(newCourse);
+					        		cacheCourseList.add(newCourse);
+					        	}
+					        }
 					    	updateProgress(i+1, AllSubjectCount);
 					    	System.out.println("SUBJECT is done:" + i);
 						}
-						return sectionCount;
+						return null;
 					}
-					
 				};
 			}	
     	};
@@ -206,32 +195,29 @@ public class Controller {
 
 			@Override
 			public void handle(WorkerStateEvent event) {
-				cacheCourseList.addAll(searchedCourseList);
-				textAreaConsole.setText("Total Number of Categories:"+ AllSubjectCount +"\n");
-		    	textAreaConsole.setText(textAreaConsole.getText() + "Total Number of Course in this search: " + 
-		    								searchedCourseList.size() + "\nTotal Number of difference sections in this search: " 
-		    								+ DoWork.getValue() + "\n");
+				textAreaConsole.setText("Total Number of Categories:"+ AllSubjectCount +"\n"
+											+ "Total Number of Course in this search: " + searchedCourseList.size()  + "\n");
 
 		    	for (Course c : searchedCourseList) {
-		    		CourseDetail(c);
+		    		String newline = c.getTitle() + "\n";
+		    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
 		    	}			
 			} 	
     	});
-    	DoWork.restart();  
-    	
+    	DoWork.start();   	
     }
 
     @FXML
     void findInstructorSfq() {    	
     	List<SFQ> temp = scraper.getInstructorSFQ(textfieldSfqUrl.getText());
-    	if(temp.isEmpty()) {
-    		System.out.println("Something goes wrong.");
+    	if(temp.isEmpty() || temp == null) {
+    		textAreaConsole.setText("Something goes wrong. Please check the url.");
     		return;
     	}
     	String output = "Instructors' average SFQ:\n";
     	for(int i=0;i<temp.size();++i) {
     		SFQ sfq = temp.get(i);
-    		output +=(sfq.getInstructor()+": "+sfq.getScore()+"\n\n");
+    		output +=(sfq.getName()+": "+sfq.getScore()+"\n\n");
     	}
     	textAreaConsole.setText(output);
     	return;
@@ -257,16 +243,20 @@ public class Controller {
     		textAreaConsole.setText(output+"No data available.\n");
     		return;
     	}
-    	for(int i=0;i<data.size();++i) {
-        	SFQ sfq = data.get(i);
-        	for(String title : enrolledCourseTitles) {
-        		if(sfq.getTitle().replaceAll("\\s","").equals(title)) {
+    	for(String title: enrolledCourseTitles) {
+    		boolean contain = false;
+    		for(SFQ sfq: data) {
+    			String s = sfq.getName().replaceAll("\\s","");
+    			if(s.equals(title)) {
+    				contain = true;
         			if(Double.isNaN(sfq.getScore())) {
-        				output += (sfq.getTitle()+": No data available.\n");
+        				output += (s+": No data available.\n");
         			}
-        			else output += (sfq.getTitle()+": "+sfq.getScore()+"\n");
+        			else output += (s+": "+sfq.getScore()+"\n");
+        			break;
         		}
-        	}
+    		}
+    		if(!contain) output += (title +": No data available.\n");
     	}
     	textAreaConsole.setText(output);
     	return;
@@ -344,7 +334,17 @@ public class Controller {
     	textAreaConsole.setText(textAreaConsole.getText() + "\n" + queryStr);
     	    	
     	for (Course c : v) {
-    		CourseDetail(c);
+    		String newline = c.getTitle() + "\n";
+    		for (int i = 0; i < c.getNumSections(); i++){
+        		Section sect = c.getSection(i);
+    			for (int j = 0; j < sect.getNumSlots(); j++){
+        			Slot slot = sect.getSlot(j);
+        			newline += sect + " Slot " + j + " | " + slot + "\n";
+        			//Echo for checking instructors[]
+        			//newline += "Taught by: " + sect.getInstructorString() + "\n";
+        		}
+    		}
+    		textAreaConsole.setText(textAreaConsole.getText() + "\n" + newline);
     	}
     	
     	/* For-loop added for Task 3 */
