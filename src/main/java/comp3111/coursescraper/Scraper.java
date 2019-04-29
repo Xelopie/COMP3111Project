@@ -293,6 +293,7 @@ public class Scraper {
 			score /= counter;
 			//score = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
 			result.get(count).setScore(score);
+			client.close();
 			return result;
 		}catch(Exception e) {
 			System.out.println(e);
@@ -348,6 +349,7 @@ public class Scraper {
 					result.add(sfq);
 				}				
 			}
+			client.close();
 			return result;
 		}catch(Exception e) {
 			System.out.println(e);
