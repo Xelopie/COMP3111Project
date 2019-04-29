@@ -6,7 +6,7 @@ package comp3111.coursescraper;
  */
 public class SFQ {
 	private String name;
-	private double score;
+	private double score = 0;
 	/**
 	 * Get the title of the course/ Instructor's name
 	 * @return a String storing the course title
