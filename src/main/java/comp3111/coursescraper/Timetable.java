@@ -26,11 +26,14 @@ public class Timetable
 	private static final int COLUMN_START = 40, SLOT_WIDTH = 99, ROW_START = 102, SLOT_HEIGHT = 20;
     private static final LocalTime START_TIME = LocalTime.parse("09:00AM", DateTimeFormatter.ofPattern("hh:mma", Locale.US));
     private static List<Color> colours = new ArrayList<Color>();	//List of different colours
- 	/**
+ 	
+    /**
  	 * Updates the TimeTable tab to display the slots from enrolled sections.
  	 * <br>
  	 * Operations include adding and removing the slots from the tab according to enrolment status.
- 	 */
+     * @param tabTimetable
+     * @param cacheCourseList
+     */
     public static void timetableUpdate(Tab tabTimetable, List<Course> cacheCourseList)
     {
     	//Initialize colours only once in runtime

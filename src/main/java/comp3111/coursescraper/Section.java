@@ -150,6 +150,7 @@ public class Section {
 	 * @param s the id to set
 	 */
 	public void setID(String s) { id = s; }
+	
 	/**
 	 * Returns the course ID.
 	 * @return the ID
@@ -172,12 +173,12 @@ public class Section {
 	 * @param i the number of instructors to set
 	 */
 	public void setNumInstructors(int i) { numInstructors = i; }
+	
 	/**
 	 * Returns the numInstructors.
 	 * @return the numInstructors
 	 */
 	public int getNumInstructors() { return numInstructors; }
-	
 
 	/**
 	 * Returns the enroll.

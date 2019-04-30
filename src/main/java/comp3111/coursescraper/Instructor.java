@@ -31,6 +31,7 @@ public class Instructor
 	 * @return the name in String
 	 */
 	public String getName() { return name; }
+	
 	/**
 	 * Sets the name.
 	 * @param s the name to set

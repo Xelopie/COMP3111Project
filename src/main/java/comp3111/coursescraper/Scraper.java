@@ -82,6 +82,11 @@ public class Scraper {
 		client.getOptions().setJavaScriptEnabled(false);
 	}
 	
+	/**
+	 * Add section to Course c from HtmlElement e
+	 * @param e some formatted HtmlElement
+	 * @param c Course to which section will be added 
+	 */
 	private void addSection(HtmlElement e, Course c)
 	{
 		e = (HtmlElement)e.getFirstByXPath(".//td");
@@ -92,6 +97,11 @@ public class Scraper {
 		c.addSection(s);
 	}
 	
+	/**
+	 * Add instructor to Section sect from HtmlElement e
+	 * @param e some formatted HtmlElement
+	 * @param sect Section to which instructor will be added
+	 */
 	private void addInstructor(HtmlElement e, Section sect)
 	{
 		List<?> instList = (List<?>)e.getByXPath(".//a");	//Instructor names are contained by all <a> elements that can be found
@@ -106,6 +116,12 @@ public class Scraper {
 		}
 	}
 	
+	/**
+	 * Add slot to Section sect from HtmlElement e
+	 * @param e some formatted HtmlELement
+	 * @param sect Section to which slot will be added
+	 * @param nonFirstRow determine whether it is not the first row when scraping
+	 */
 	private void addSlot(HtmlElement e, Section sect, boolean nonFirstRow)	//Boolean parameter originally named secondRow, changed to suit better for max number of slots being 3
 	{
 		String times[] = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
@@ -198,6 +214,7 @@ public class Scraper {
 		}
 		return null; 
 	}
+	
 	/**
 	 * Returns a list containing subjects' name from an URL combined from 2 parameters
 	 * @param baseurl from the Base URL text field
@@ -221,6 +238,7 @@ public class Scraper {
 		}
 		return null;
 	}
+	
 	/**
 	 * Get all SFQ data for courses available on the website
 	 * @param sfqurl from SFQ url text field
@@ -300,8 +318,9 @@ public class Scraper {
 		}
 		return null;
 	}
+	
 	/**
-	 * Get data under Instructor Overall Mean for each instructor and calculate the mean if >1 sections are taught
+	 * Get data under Instructor Overall Mean for each instructor and calculate the mean if more than 1 sections are taught
 	 * @param sfqurl from SFQ url text field
 	 * @return A list storing the SFQ including the instructor's name and his/her average score
 	 */

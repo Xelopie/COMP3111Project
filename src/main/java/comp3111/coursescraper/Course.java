@@ -118,6 +118,7 @@ public class Course {
 	 * @return the numSections
 	 */
 	public int getNumSections() { return numSections; }
+	
 	/**
 	 * Sets the numSections
 	 * @param numSections the numSections to set

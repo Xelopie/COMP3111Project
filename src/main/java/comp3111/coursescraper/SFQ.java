@@ -7,6 +7,7 @@ package comp3111.coursescraper;
 public class SFQ {
 	private String name;
 	private double score = 0;
+	
 	/**
 	 * Get the title of the course/ Instructor's name
 	 * @return a String storing the course title
@@ -14,6 +15,7 @@ public class SFQ {
 	public String getName() {
 		return name;
 	}
+	
 	/**
 	 * Get the score
 	 * @return score in double
@@ -21,6 +23,7 @@ public class SFQ {
 	public double getScore() {
 		return score;
 	}
+	
 	/**
 	 * Set the course title/ Instuctor's name
 	 * @param name
@@ -28,6 +31,7 @@ public class SFQ {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	/**
 	 * Set the score
 	 * @param score

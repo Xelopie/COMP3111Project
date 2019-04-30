@@ -35,6 +35,7 @@ public class Slot {
 		s.venue = this.venue;
 		return s;
 	}
+	
 	/**
 	 * Can be called implicitly when slot is needed as String.
 	 * @return the slot in String, formatted for display purpose
@@ -43,6 +44,7 @@ public class Slot {
 	public String toString() {
 		return DAYS[day] + start.toString() + "-" + end.toString() + " | " + venue;
 	}
+	
 	/**
 	 * Returns the start hour.
 	 * @return the start hour in int
@@ -50,6 +52,7 @@ public class Slot {
 	public int getStartHour() {
 		return start.getHour();
 	}
+	
 	/**
 	 * Returns the start minute.
 	 * @return the start minute in int
@@ -57,6 +60,7 @@ public class Slot {
 	public int getStartMinute() {
 		return start.getMinute();
 	}
+	
 	/**
 	 * Returns the end hour.
 	 * @return the end hour in int
@@ -64,6 +68,7 @@ public class Slot {
 	public int getEndHour() {
 		return end.getHour();
 	}
+	
 	/**
 	 * Returns the end minute.
 	 * @return the end minute in int
@@ -71,6 +76,7 @@ public class Slot {
 	public int getEndMinute() {
 		return end.getMinute();
 	}
+	
 	/**
 	 * Returns the start time.
 	 * @return the start time in java.time.LocalTime
@@ -78,6 +84,7 @@ public class Slot {
 	public LocalTime getStart() {
 		return start;
 	}
+	
 	/**
 	 * Sets the start time.
 	 * @param start the start time to set
@@ -85,6 +92,7 @@ public class Slot {
 	public void setStart(String start) {
 		this.start = LocalTime.parse(start, DateTimeFormatter.ofPattern("hh:mma", Locale.US));
 	}
+	
 	/**
 	 * Returns the end time.
 	 * @return the end time in java.time.LocalTime
@@ -92,6 +100,7 @@ public class Slot {
 	public LocalTime getEnd() {
 		return end;
 	}
+	
 	/**
 	 * Sets the end time.
 	 * @param end the end time to set
@@ -99,6 +108,7 @@ public class Slot {
 	public void setEnd(String end) {
 		this.end = LocalTime.parse(end, DateTimeFormatter.ofPattern("hh:mma", Locale.US));
 	}
+	
 	/**
 	 * Returns the venue.
 	 * @return the venue in String
@@ -106,6 +116,7 @@ public class Slot {
 	public String getVenue() {
 		return venue;
 	}
+	
 	/**
 	 * Sets the venue.
 	 * @param venue the venue to set
@@ -121,6 +132,7 @@ public class Slot {
 	public int getDay() {
 		return day;
 	}
+	
 	/**
 	 * Sets the day.
 	 * @param day the day to set

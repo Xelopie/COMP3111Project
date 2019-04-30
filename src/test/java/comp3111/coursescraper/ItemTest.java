@@ -43,16 +43,6 @@ public class ItemTest {
 	}
 	
 	@Test
-	public void testSection() {
-		
-	}
-	
-	@Test
-	public void testSlot() {
-		
-	}
-	
-	@Test
 	public void testSFQ() {
 		SFQ sfq = new SFQ();
 		
@@ -62,6 +52,5 @@ public class ItemTest {
 		sfq.setScore(0);
 		assertEquals(sfq.getScore(),0,0);
 	}
-	
-	
+		
 }

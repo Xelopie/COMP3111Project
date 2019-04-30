@@ -143,13 +143,19 @@ public class Controller {
    
     private List<String> enrolledCourseTitles = new Vector<String>();
 
+    /**
+     * Initialization when the program starts
+     */
     @FXML
     public void initialize() {
     	buttonSfqEnrollCourse.setDisable(true);
     }
  
+    /**
+     * Event used to handle all subject search
+     */
     @FXML
-    void allSubjectSearch(){
+    public void allSubjectSearch(){
     	searchedCourseList.clear();
     	buttonSfqEnrollCourse.setDisable(false);
     	if(firstClick) {
@@ -219,8 +225,11 @@ public class Controller {
     	DoWork.start();   	
     }
 
+    /**
+     * Event used to find SFQ of instructors
+     */
     @FXML
-    void findInstructorSfq() {    	
+    public void findInstructorSfq() {    	
     	List<SFQ> temp = scraper.getInstructorSFQ(textfieldSfqUrl.getText());
     	if(temp.isEmpty() || temp == null) {
     		textAreaConsole.setText("Something goes wrong. Please check the url.");
@@ -235,8 +244,11 @@ public class Controller {
     	return;
     }
 
+    /**
+     * Event used to find SFQ of enrolled courses
+     */
     @FXML
-    void findSfqEnrollCourse() {
+    public void findSfqEnrollCourse() {
     	if(enrolledSectionList.isEmpty()) {
     		textAreaConsole.setText("No course enrolled.");
     		return;
@@ -278,7 +290,7 @@ public class Controller {
      * Event to handle the "Search" button
      */
     @FXML
-    void search() {
+    public void search() {
     	buttonSfqEnrollCourse.setDisable(false);
     	firstClick = false;
     	
@@ -396,7 +408,7 @@ public class Controller {
      * Event to handle the "Select All" button
      */
     @FXML    
-    void selectAll() {
+    public void selectAll() {
     	if (buttonSelectAll.getText().equals("Select All")) 
     	{
 	    	cboxAM.setSelected(true);
@@ -440,7 +452,7 @@ public class Controller {
      * Event to handle the filter
      */
     @FXML
-    void filter() {
+    public void filter() {
     	// Clear the console first
     	textAreaConsole.setText("");
     	
@@ -582,10 +594,10 @@ public class Controller {
     }
         
     /**
-     * Event to handle the list & enroll
+     * Event to handle the list and enroll
      */
     @FXML
-    void list() {
+    public void list() {
     	// Run the filter once to show filtered info
     	filter();
     	
