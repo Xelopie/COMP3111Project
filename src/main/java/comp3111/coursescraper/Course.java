@@ -1,33 +1,56 @@
 package comp3111.coursescraper;
 
+/**
+ * Stores the information of a course.
+ */
+
 public class Course {
-	private static final int DEFAULT_MAX_SLOT = 20;
+	private static final int DEFAULT_MAX_SECTION = 75;	//LANG1003S has 73 valid sections
 	
 	private String title ; 
 	private String description ;
 	private String exclusion;
+	private String attribute;
 	private Section[] sections;
-	private Slot [] slots;
-	private int numSlots;
+	private int numSections;
 	
+	/**
+	 * Default constructor. Initializes the static arrays for Section objects.
+	 */
 	public Course() {
-		slots = new Slot[DEFAULT_MAX_SLOT];
-		for (int i = 0; i < DEFAULT_MAX_SLOT; i++) slots[i] = null;
-		numSlots = 0;
+		sections = new Section[DEFAULT_MAX_SECTION];
+		for (int i = 0; i < DEFAULT_MAX_SECTION; i++)
+		{
+			sections[i] = null;
+		}
+		numSections = 0;
 	}
 	
-	public void addSlot(Slot s) {
-		if (numSlots >= DEFAULT_MAX_SLOT)
+	/**
+	 * Adds a section to sections[]
+	 * @param s the section to add
+	 */
+	public void addSection(Section s)
+	{
+		if (numSections >= DEFAULT_MAX_SECTION)
 			return;
-		slots[numSlots++] = s.clone();
+		sections[numSections++] = s.clone();
 	}
-	public Slot getSlot(int i) {
-		if (i >= 0 && i < numSlots)
-			return slots[i];
+	
+	/**
+	 * Returns a section[] item specified by the index
+	 * @param i the index of the section item in the array
+	 * @return the section[i] item
+	 */
+	public Section getSection(int i)
+	{
+		if (i >= 0 && i < numSections)
+			return sections[i];
 		return null;
 	}
-
+	
 	/**
+	 * Returns the course title.
 	 * @return the title
 	 */
 	public String getTitle() {
@@ -35,6 +58,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the title.
 	 * @param title the title to set
 	 */
 	public void setTitle(String title) {
@@ -42,6 +66,7 @@ public class Course {
 	}
 
 	/**
+	 * Returns the course description.
 	 * @return the description
 	 */
 	public String getDescription() {
@@ -49,6 +74,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the course description.
 	 * @param description the description to set
 	 */
 	public void setDescription(String description) {
@@ -56,6 +82,7 @@ public class Course {
 	}
 
 	/**
+	 * Returns the course exclusion.
 	 * @return the exclusion
 	 */
 	public String getExclusion() {
@@ -63,6 +90,7 @@ public class Course {
 	}
 
 	/**
+	 * Sets the course exclusion.
 	 * @param exclusion the exclusion to set
 	 */
 	public void setExclusion(String exclusion) {
@@ -70,18 +98,138 @@ public class Course {
 	}
 
 	/**
-	 * @return the numSlots
+	 * Returns the course attribute.
+	 * @return the attribute
 	 */
-	public int getNumSlots() {
-		return numSlots;
-	}
-
-	/**
-	 * @param numSlots the numSlots to set
-	 */
-	public void setNumSlots(int numSlots) {
-		this.numSlots = numSlots;
+	public String getAttribute() {
+		return attribute;
 	}
 	
+	/**
+	 * Sets the course attribute.
+	 * @param attribute the attribute to set
+	 */
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
+	}
+	
+	/**
+	 * Returns the number of sections.
+	 * @return the numSections
+	 */
+	public int getNumSections() { return numSections; }
+	/**
+	 * Sets the numSections
+	 * @param numSections the numSections to set
+	 */
+	public void setNumSections(int numSections) { this.numSections = numSections; }
+	
+	/**
+	 * Returns true if the course is valid. A valid course has at least 1 valid section.
+	 * @return true if this is a valid course
+	 */
+	public boolean isValidCourse() { return (getNumValidSections() > 0? true: false); }	//A course has to have at least 1 valid section
 
+	/**
+	 * Returns the number of valid sections in this course.
+	 * @return the number of valid sections in this course
+	 */
+	public int getNumValidSections()
+	{
+		int validCount = numSections;	//Using decrement strategy
+		for (int i = 0; i < numSections; i++)
+		{
+			if (!sections[i].isValidSection())
+				validCount--;
+		}
+		return validCount;
+	}
+
+	/* Helper functions for filter (Task 2) */
+	
+	/**
+	 * Determine if the course satisfies the filter condition (Common Core)
+	 * @return true if the course is a common core
+	 */
+	public boolean isCC4Y() {
+		if (attribute.contains("Common Core") && attribute.contains("4Y")) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (No Exclusion)
+	 * @return true if the course has no exclusion
+	 */
+	public boolean isNoEx() {
+		if (exclusion.contains("null")) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (AM/PM)
+	 * @return true if the course contains both AM and PM slots
+	 * @return true if the course contains a slot starting at AM and ending at PM
+	 */
+	public boolean containsAMPMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsAMPMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (AM)
+	 * @return true if the course contains a AM slot
+	 */
+	public boolean containsAMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsAMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (PM)
+	 * @return true if the course contains a PM slot
+	 */
+	public boolean containsPMSection() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].containsPMSlot())
+				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (Mon to Sat)
+	 * @return true on boolean[0] if the course contains a Monday slot, true on boolean[1] if the course contains a Tuesday slot, and so on  
+	 */
+	public boolean[] containsDaySection() {
+		boolean[] bContainsDaySection = new boolean[6];
+		for (int i = 0; i < numSections; i++) {
+			for (int k = 0; k < 6; k++) {
+				bContainsDaySection[k] |= sections[i].containsDaySlot()[k];
+			}
+		}
+		return bContainsDaySection;
+	}
+	
+	/**
+	 * Determine if the course satisfies the filter condition (Contains Lab or Tutorial)
+	 * @return true if the course contains Lab or tutorial
+	 */
+	public boolean containsLabOrTut() {
+		for (int i = 0; i < numSections; i++) {
+			if (sections[i].getCode().contains("LA") || sections[i].getCode().contains("T"))
+				return true;
+		}
+		return false;
+	}
+	
 }

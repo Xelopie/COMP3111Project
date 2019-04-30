@@ -20,38 +20,48 @@ import javafx.fxml.FXMLLoader;
 public class ItemTest {
 
 	@Test
-	public void testSetTitle() {
-		Course i = new Course();
-		i.setTitle("ABCDE");
-		assertEquals(i.getTitle(), "ABCDE");
+	public void testCourse() {
+		/* Default constructor */
+		Course course = new Course();
+		assertEquals(course.getNumSections(), 0);
+		
+		/* Getter and Setter */
+		course.setTitle("Test Title");
+		assertEquals(course.getTitle(), "Test Title");
+		
+		course.setAttribute("Test Attribute");
+		assertEquals(course.getAttribute(), "Test Attribute");
+		
+		course.setDescription("Test Description");
+		assertEquals(course.getDescription(), "Test Description");
+		
+		course.setExclusion("Test Exclusion");
+		assertEquals(course.getExclusion(), "Test Exclusion");
+		
+		course.setNumSections(1);
+		assertEquals(course.getNumSections(), 1);
 	}
 	
 	@Test
-	public void testSlotTime() {
-		Slot s = new Slot();
-		s.setStart("02:00AM");
-		assertEquals(s.getStartHour(), 2);
+	public void testSection() {
+		
 	}
 	
 	@Test
-	public void testSetDescription() {
-		Course c = new Course();
-		c.setDescription("Test Description");
-		assertEquals(c.getDescription(), "Test Description");
+	public void testSlot() {
+		
 	}
 	
 	@Test
-	public void testSetExclusion() {
-		Course c = new Course();
-		c.setExclusion("Test Exclusion");
-		assertEquals(c.getExclusion(), "Test Exclusion");
+	public void testSFQ() {
+		SFQ sfq = new SFQ();
+		
+		sfq.setName("Test Name");
+		assertEquals(sfq.getName(), "Test Name");
+		
+		sfq.setScore(0);
+		assertEquals(sfq.getScore(),0,0);
 	}
 	
-	@Test 
-	public void testAddSlot() {
-		Course c = new Course();
-		Slot s = new Slot();
-		c.addSlot(s);
-		assertTrue(c.getSlot(0) != null);
-	}
+	
 }

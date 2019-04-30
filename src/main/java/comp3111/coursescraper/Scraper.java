@@ -1,20 +1,15 @@
 package comp3111.coursescraper;
 
-import java.net.URLEncoder;
 import java.util.List;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.DomText;
 import java.util.Vector;
 
 
 /**
- * WebScraper provide a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
+ * WebScraper provides a sample code that scrape web content. After it is constructed, you can call the method scrape with a keyword, 
  * the client will go to the default url and parse the page by looking at the HTML DOM.  
  * <br>
  * In this particular sample code, it access to HKUST class schedule and quota page (COMP). 
@@ -86,10 +81,35 @@ public class Scraper {
 		client.getOptions().setCssEnabled(false);
 		client.getOptions().setJavaScriptEnabled(false);
 	}
-
-	private void addSlot(HtmlElement e, Course c, boolean secondRow) {
-		String times[] =  e.getChildNodes().get(secondRow ? 0 : 3).asText().split(" ");
-		String venue = e.getChildNodes().get(secondRow ? 1 : 4).asText();
+	
+	private void addSection(HtmlElement e, Course c)
+	{
+		e = (HtmlElement)e.getFirstByXPath(".//td");
+		String sect[] = e.asText().split(" ");	//The text before split looks like "L1 (1234)"
+		Section s = new Section();
+		s.setCode(sect[0]);
+		s.setID(sect[1].substring(1, sect[1].length()-1));	//Take the id out of the brackets
+		c.addSection(s);
+	}
+	
+	private void addInstructor(HtmlElement e, Section sect)
+	{
+		List<?> instList = (List<?>)e.getByXPath(".//a");	//Instructor names are contained by all <a> elements that can be found
+		if (instList == null)
+			return;
+		for (HtmlElement instElem: (List<HtmlElement>)instList)
+		{
+			Instructor inst = new Instructor();
+			inst.setName(instElem.asText());
+			sect.addInstructor(inst);
+			
+		}
+	}
+	
+	private void addSlot(HtmlElement e, Section sect, boolean nonFirstRow)	//Boolean parameter originally named secondRow, changed to suit better for max number of slots being 3
+	{
+		String times[] = e.getChildNodes().get(nonFirstRow ? 0 : 3).asText().split(" ");
+		String venue = e.getChildNodes().get(nonFirstRow ? 1 : 4).asText();
 		if (times[0].equals("TBA"))
 			return;
 		for (int j = 0; j < times[0].length(); j+=2) {
@@ -101,18 +121,24 @@ public class Scraper {
 			s.setStart(times[1]);
 			s.setEnd(times[3]);
 			s.setVenue(venue);
-			c.addSlot(s);	
+			sect.addSlot(s);	
 		}
 
 	}
 
+	/**
+	 * Returns a List containing Course scraped from an URL combined from the 3 parameters
+	 * @param baseurl from the Base URL text field
+	 * @param term from the Term text field
+	 * @param sub from the Subject text field
+	 * @return a List containing Course scraped from the combined URL
+	 */
 	public List<Course> scrape(String baseurl, String term, String sub) {
 
 		try {
 			
 			HtmlPage page = client.getPage(baseurl + "/" + term + "/subject/" + sub);
 
-			
 			List<?> items = (List<?>) page.getByXPath("//div[@class='course']");
 			
 			Vector<Course> result = new Vector<Course>();
@@ -126,31 +152,209 @@ public class Scraper {
 				
 				List<?> popupdetailslist = (List<?>) htmlItem.getByXPath(".//div[@class='popupdetail']/table/tbody/tr");
 				HtmlElement exclusion = null;
+				HtmlElement attribute = null;
 				for ( HtmlElement e : (List<HtmlElement>)popupdetailslist) {
 					HtmlElement t = (HtmlElement) e.getFirstByXPath(".//th");
 					HtmlElement d = (HtmlElement) e.getFirstByXPath(".//td");
 					if (t.asText().equals("EXCLUSION")) {
 						exclusion = d;
 					}
+					if (t.asText().equals("ATTRIBUTES")) {
+						attribute = d;
+					}
 				}
 				c.setExclusion((exclusion == null ? "null" : exclusion.asText()));
-				
-				List<?> sections = (List<?>) htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
-				for ( HtmlElement e: (List<HtmlElement>)sections) {
-					addSlot(e, c, false);
-					e = (HtmlElement)e.getNextSibling();
-					if (e != null && !e.getAttribute("class").contains("newsect"))
-						addSlot(e, c, true);
+				c.setAttribute((attribute == null ? "null" : attribute.asText()));
+
+				List<?> htmlInfo = (List<?>)htmlItem.getByXPath(".//tr[contains(@class,'newsect')]");
+				for (int j = 0; j < htmlInfo.size(); j++)
+
+				{
+					HtmlElement htmlElem = (HtmlElement)htmlInfo.get(j);
+					
+					addSection(htmlElem, c);
+					addInstructor(htmlElem, c.getSection(j));
+					addSlot(htmlElem, c.getSection(j), false);
+					htmlElem = (HtmlElement)htmlElem.getNextSibling();
+					if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))	//If the section has a second slot, and the second slot does not contain "newsect"
+					{
+						addSlot(htmlElem, c.getSection(j), true);
+						htmlElem = (HtmlElement)htmlElem.getNextSibling();
+						//Slot is defined to have a max size of 3
+						if (htmlElem != null && !htmlElem.getAttribute("class").contains("newsect"))
+						{
+							addSlot(htmlElem, c.getSection(j), true);
+						}
+					}
 				}
-				
+
 				result.add(c);
 			}
 			client.close();
 			return result;
 		} catch (Exception e) {
+			//The only exception should be 404 page
+			//System.out.println(e);
+		}
+		return null; 
+	}
+	/**
+	 * Returns a list containing subjects' name from an URL combined from 2 parameters
+	 * @param baseurl from the Base URL text field
+	 * @param term from the Term text field
+	 * @return a List containing Subjects scraped from the combined URL
+	 */
+	public List<String> getSubjects(String baseurl, String term){
+		try {
+			HtmlPage page = client.getPage(baseurl + term + "/");
+			List<?> items = (List<?>) page.getByXPath("//div[@class='depts']/a");
+			Vector<String> result =  new Vector<String>();
+			for(int i=0; i<items.size();++i) {
+				HtmlElement htmlItem = (HtmlElement) items.get(i);
+				String subj = htmlItem.asText();
+				result.add(subj);
+			}
+			client.close();
+			return result;		
+		}catch(Exception e) {
 			System.out.println(e);
 		}
 		return null;
 	}
-
+	/**
+	 * Get all SFQ data for courses available on the website
+	 * @param sfqurl from SFQ url text field
+	 * @return Returns a list of SFQ including course title and its average score
+	 */
+	public List<SFQ> getSFQData(String sfqurl){
+		try {
+			HtmlPage page = client.getPage(sfqurl);
+			List<SFQ> result = new Vector<SFQ>();
+			
+			/*Get all course title and create SFQ*/
+			List<String> titleList = new Vector<String>();
+			List<?> temp = (List<?>) page.getByXPath("//td[@colspan=3]");
+			
+			for(int i=0;i<temp.size();++i) {
+				HtmlElement e = (HtmlElement) temp.get(i);
+				String title = e.asText();			
+				String titleCheck = title.trim();
+				if(!titleCheck.equals("Department Overall") 
+						&& !titleCheck.equals("Course Group Overall")) {
+					titleList.add(title);		
+					SFQ sfq = new SFQ();
+					sfq.setName(title);
+					result.add(sfq);
+				}
+			}
+			/*Get Score*/
+			int count = -1, counter=0; double score=0;
+			temp = (List<?>) page.getByXPath("//table[@border=1]");
+			int table_count = temp.size();
+			
+			for(int i=1;i<table_count+1;++i) {//for each table
+				temp = (List<?>) page.getByXPath("//table[@border=1]["+ i +"]//tr"); //get every row in the table
+				int row_count = temp.size()-1; //last row is not needed
+				for(int j=0;j<row_count;++j) { 
+					temp = (List<?>) page.getByXPath("//table[@border=1]["+i+"]//tr["+j+"]/td"); //get all td in each row
+					
+					if(!temp.isEmpty()) { //temp is empty for the first row for every table
+						HtmlElement x = (HtmlElement) temp.get(0); //get first td for checking
+						if(!x.asText().equals(" ")) { //first td not empty cell
+							for(String title: titleList) {
+								if(x.asText().equals(title)) {
+									if(count >-1) { 
+										score /= counter;
+										//score = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
+										result.get(count).setScore(score); //set SFQ score
+									}
+									count++; //move to next course
+									score = 0; counter = 0; //reset score and no. of section
+								}
+							}
+						}
+						else {
+							x = (HtmlElement) temp.get(1); //check second td
+							if(!x.asText().equals(" ")) { //if contains section code
+								x = (HtmlElement) temp.get(3);
+								String data = x.asText();
+								int index = data.indexOf("(");				
+								data = data.substring(0, index);
+								if(!data.equals("-")) { //if number is available
+									score += Double.parseDouble(data);
+									counter++;
+								}
+							}
+						}
+					}
+				}
+			}
+			/*set score for the last course of last table*/
+			score /= counter;
+			//score = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
+			result.get(count).setScore(score);
+			client.close();
+			return result;
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	/**
+	 * Get data under Instructor Overall Mean for each instructor and calculate the mean if >1 sections are taught
+	 * @param sfqurl from SFQ url text field
+	 * @return A list storing the SFQ including the instructor's name and his/her average score
+	 */
+	public List<SFQ> getInstructorSFQ(String sfqurl){
+		try {
+			HtmlPage page = client.getPage(sfqurl);
+			List<SFQ> result = new Vector<SFQ>();
+			/*Get the name of Instructors first*/
+			List<String> nameList = new Vector<String>();
+						
+			List<?> temp = (List<?>) page.getByXPath("//td[not(@align='center')][3]"); 
+			
+			for(int i=0; i<temp.size();++i) {
+				HtmlElement e = (HtmlElement)temp.get(i);
+				String name = e.asText();
+				if(!name.equals(" ") && name.charAt(1) !=' ') {
+					if(!nameList.contains(name))
+						nameList.add(name); //empty cells won't be added
+				}
+			}
+			/*Find the score by name*/
+			temp= (List<?>) page.getByXPath("//td");
+			
+			for(String s: nameList) {
+				double sum = 0; int count = 0;
+				for(int i=0;i<temp.size();++i) {
+					HtmlElement e = (HtmlElement)temp.get(i);
+					if(e.asText().equals(s)) {
+						e = (HtmlElement) temp.get(i+2);
+						String data = e.asText();
+						int index = data.indexOf("(");				
+						data = data.substring(0, index);
+						if(!data.equals("-")) {
+							sum += Double.parseDouble(data);
+							count++;
+						}
+					}
+				}
+				if(count !=0) { //if at least one data found, add a new SFQ
+					SFQ sfq = new SFQ();
+					sum /= count;
+					//sum = Math.round(sum * 10) / 10.0;  /*round to 1dp is optional*/
+					sfq.setName(s);
+					sfq.setScore(sum);
+					result.add(sfq);
+				}				
+			}
+			client.close();
+			return result;
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+		return null;
+	}
+	
 }
