@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Control the behavior of the program
+ * @author Xelopie
+ *
+ */
 public class Controller {
 	
     @FXML

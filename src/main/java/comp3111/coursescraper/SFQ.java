@@ -1,7 +1,7 @@
 package comp3111.coursescraper;
 /**
  * 
- * Stores the Course title or instructors' name, and the score
+ * Stores the SFQ
  *
  */
 public class SFQ {

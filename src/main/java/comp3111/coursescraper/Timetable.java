@@ -17,10 +17,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+
 /**
  * Simple class with the only functionality to update the Timetable tab.
  */
-
 public class Timetable
 {
 	private static final int COLUMN_START = 40, SLOT_WIDTH = 99, ROW_START = 102, SLOT_HEIGHT = 20;
