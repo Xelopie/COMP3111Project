@@ -230,7 +230,6 @@ public class FxTest extends ApplicationTest {
 		clickOn("#tabAllSubject");
 		clickOn("#buttonAllSubjectSearch");
 		assertTrue(console.getText().contains("Total Number of Categories:74"));
-		sleep(10000);
 	}
 	
 	@Test
