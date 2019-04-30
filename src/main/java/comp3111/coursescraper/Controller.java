@@ -100,6 +100,9 @@ public class Controller {
     private TextField textfieldSfqUrl;
 
     @FXML
+    private Button buttonAllSubjectSearch;
+    
+    @FXML
     private Button buttonSfqEnrollCourse;
 
     @FXML

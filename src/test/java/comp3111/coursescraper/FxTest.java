@@ -15,6 +15,7 @@ import org.testfx.framework.junit.ApplicationTest;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -225,11 +226,17 @@ public class FxTest extends ApplicationTest {
 	}
 	
 	@Test
-	public void testAllSubjectSearch() {
-		TextArea console = (TextArea)s.lookup("#textAreaConsole");
+	public void testAllSubjectSearch() {		
 		clickOn("#tabAllSubject");
 		clickOn("#buttonAllSubjectSearch");
+		TextArea console = (TextArea)s.lookup("#textAreaConsole");
 		assertTrue(console.getText().contains("Total Number of Categories:74"));
+		sleep(1000);
+		clickOn("#buttonAllSubjectSearch");
+
+		ProgressBar progressbar = (ProgressBar)s.lookup("#progressbar");
+		while (progressbar.getProgress() != 1);
+		assertTrue(progressbar.getProgress() == 1);
 	}
 	
 	@Test
@@ -292,5 +299,6 @@ public class FxTest extends ApplicationTest {
 		clickOn("#buttonSfqEnrollCourse");
 		assertTrue(console.getText().contains("The Enrolled Course Overall Mean is(if available):\nACCT2010: No data available."));
 	}
+	
 }
 
